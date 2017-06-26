@@ -1,57 +1,41 @@
 osl-docker Cookbook
 ===================
-TODO: Enter the cookbook description here.
 
-e.g.
-This cookbook makes your favorite breakfast sandwich.
+OSL wrapper cookbook using
+[docker](https://supermarket.chef.io/cookbooks/docker) as a base. It installs
+the docker package from Docker Inc. and starts the docker service.
 
 Requirements
 ------------
-TODO: List your cookbook requirements. Be sure to include any
-requirements this cookbook has on platforms, libraries, other cookbooks,
-packages, operating systems, etc.
 
-e.g.
-#### packages
-- `toaster` - osl-docker needs toaster to brown your bagel.
+- Chef 12.18.x or higher
 
 Attributes
 ----------
-TODO: List your cookbook attributes here.
 
-e.g.
-#### osl-docker::default
-<table>
-  <tr>
-    <th>Key</th>
-    <th>Type</th>
-    <th>Description</th>
-    <th>Default</th>
-  </tr>
-  <tr>
-    <td><tt>['osl-docker']['bacon']</tt></td>
-    <td>Boolean</td>
-    <td>whether to include bacon</td>
-    <td><tt>true</tt></td>
-  </tr>
-</table>
+- ``node['osl-docker']['package']`` -- Key/value hash which directly relates to
+  the ``docker_installation_package`` resource.
+- ``node['osl-docker']['service'] `` -- Key/value hash which directly relates to
+  the ``docker_service``.
+
+For example, if you wish to set the package version you could do the following:
+
+``` ruby
+node['osl-docker']['package']['version'] = '1.13.1'
+```
+
+If you wish to have have docker to listen on TCP instead of a socket, you can do
+the following:
+
+``` ruby
+node['osl-docker']['service']['host'] = 'tcp://0.0.0.0:2375'
+```
 
 Usage
 -----
 #### osl-docker::default
-TODO: Write usage instructions for each cookbook.
 
-e.g.
-Just include `osl-docker` in your node's `run_list`:
-
-```json
-{
-  "name":"my_node",
-  "run_list": [
-    "recipe[osl-docker]"
-  ]
-}
-```
+Installs Docker from Docker Inc's repo and starts the docker service
 
 Contributing
 ------------
