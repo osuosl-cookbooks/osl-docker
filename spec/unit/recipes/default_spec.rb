@@ -14,9 +14,7 @@ describe 'osl-docker::default' do
         expect(chef_run).to create_docker_installation_package('default').with(version: docker_version)
       end
       it do
-        expect(chef_run).to create_docker_service('default').with(
-          host: nil
-        )
+        expect(chef_run).to create_docker_service('default')
       end
       it do
         expect(chef_run).to start_docker_service('default')

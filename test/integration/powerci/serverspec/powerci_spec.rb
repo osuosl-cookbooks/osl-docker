@@ -16,5 +16,5 @@ describe command('docker ps') do
 end
 
 describe file('/etc/docker/daemon.json') do
-  its(:content) { should match %r{"hosts": ['tcp://0.0.0.0:2375']} }
+  its(:content) { should match %r{"hosts": \['tcp://0.0.0.0:2375'\]} }
 end

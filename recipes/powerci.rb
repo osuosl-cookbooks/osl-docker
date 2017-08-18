@@ -16,6 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-node.override['osl-docker']['daemon-socket'] = 'tcp://0.0.0.0:2375'
+node.override['osl-docker']['service'] = { host: 'tcp://0.0.0.0:2375' }
 
 include_recipe 'osl-docker::default'
