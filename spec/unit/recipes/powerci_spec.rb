@@ -1,6 +1,6 @@
 require_relative '../../spec_helper'
 
-describe 'osl-docker::default' do
+describe 'osl-docker::powerci' do
   ALL_PLATFORMS.each do |p|
     context "#{p[:platform]} #{p[:version]}" do
       cached(:chef_run) do
@@ -15,7 +15,7 @@ describe 'osl-docker::default' do
       end
       it do
         expect(chef_run).to create_docker_service('default').with(
-          host: nil
+          host: ['tcp://0.0.0.0:2375']
         )
       end
       it do

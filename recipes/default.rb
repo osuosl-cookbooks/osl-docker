@@ -44,5 +44,6 @@ docker_service 'default' do
   node['osl-docker']['service'].each do |key, value|
     send(key.to_sym, value)
   end
+  host node['osl-docker']['daemon-socket']
   action [:create, :start]
 end
