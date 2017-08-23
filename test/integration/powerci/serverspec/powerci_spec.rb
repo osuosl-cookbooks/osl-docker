@@ -15,6 +15,6 @@ describe command('docker ps') do
   its(:exit_status) { should eq 0 }
 end
 
-describe file('/etc/docker/daemon.json') do
-  its(:content) { should match %r{"hosts": \['tcp://0.0.0.0:2375'\]} }
+describe port(2375) do
+  it { should be_listening.with('tcp') }
 end

@@ -6,13 +6,12 @@ describe 'osl-docker::powerci' do
       cached(:chef_run) do
         ChefSpec::SoloRunner.new(p).converge(described_recipe)
       end
-      docker_version = '1.13.1'
       it 'converges successfully' do
         expect { chef_run }.to_not raise_error
       end
       it do
         expect(chef_run).to create_docker_service('default').with(
-          host: ['tcp://0.0.0.0:2375']
+          host: ['tcp://127.0.0.1:2375']
         )
       end
     end
