@@ -14,6 +14,11 @@ describe 'osl-docker::powerci' do
           host: ['tcp://0.0.0.0:2375']
         )
       end
+      it do
+        expect(chef_run).to add_magic_shell_environment('DOCKER_HOST').with(
+          value: 'tcp://0.0.0.0:2375'
+        )
+      end
     end
   end
 end
