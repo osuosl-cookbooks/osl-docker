@@ -16,5 +16,5 @@ describe command('docker ps') do
 end
 
 describe port(2375) do
-  it { should be_listening.with('tcp') }
+  it { should be_listening.with('tcp6') }
 end
