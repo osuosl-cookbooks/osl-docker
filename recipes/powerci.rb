@@ -19,3 +19,7 @@
 node.override['osl-docker']['service'] = { host: 'tcp://0.0.0.0:2375' }
 
 include_recipe 'osl-docker::default'
+
+magic_shell_environment 'DOCKER_HOST' do
+  value 'tcp://127.0.0.1:2375'
+end

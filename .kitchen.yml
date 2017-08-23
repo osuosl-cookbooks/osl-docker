@@ -6,3 +6,5 @@ suites:
   - name: powerci
     run_list:
       - recipe[osl-docker::powerci]
+    excludes:
+      - debian-8
