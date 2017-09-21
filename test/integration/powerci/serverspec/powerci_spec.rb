@@ -8,7 +8,7 @@ describe service('docker') do
 end
 
 describe command('docker --version') do
-  its(:stdout) { should match(/1\.13\.1/) }
+  its(:stdout) { should match(/17\.06\.1-ce/) }
 end
 
 describe command('docker ps') do
