@@ -8,7 +8,12 @@ describe service('docker') do
 end
 
 describe command('docker --version') do
-  its(:stdout) { should match(/1\.13\.1/) }
+  case os[:family]
+  when 'redhat'
+    its(:stdout) { should match(/17\.06\.1-ce/) }
+  when 'debian'
+    its(:stdout) { should match(/17\.05\.0-ce/) }
+  end
 end
 
 describe command('docker ps') do

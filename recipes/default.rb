@@ -19,16 +19,29 @@ if node['platform_family'] == 'rhel'
   include_recipe 'yum-docker'
   include_recipe 'yum-plugin-versionlock'
 
-  yum_version_lock 'docker-engine' do
+  if node['kernel']['machine'] == 'ppc64le'
+    edit_resource(:yum_repository, 'docker-main') do
+      baseurl 'http://ftp.unicamp.br/pub/ppc64el/rhel/7/docker-ppc64el/'
+      gpgcheck false
+    end
+  else
+    edit_resource(:yum_repository, 'docker-main') do
+      baseurl 'https://download.docker.com/linux/centos/7/x86_64/stable/'
+      gpgkey 'https://download.docker.com/linux/centos/gpg'
+    end
+  end
+
+  yum_version_lock node['osl-docker']['package']['package_name'] do
     version node['osl-docker']['package']['version']
-    release '1.el7.centos'
+    release node['osl-docker']['package_release']
     notifies :makecache, 'yum_repository[docker-main]', :immediately
   end
+
 end
 
 include_recipe 'apt-docker' if node['platform_family'] == 'debian'
 
-apt_preference 'docker-engine' do
+apt_preference node['osl-docker']['package']['package_name'] do
   pin "version #{node['osl-docker']['package']['version']}*"
   pin_priority '1001'
   only_if { node['platform_family'] == 'debian' }
