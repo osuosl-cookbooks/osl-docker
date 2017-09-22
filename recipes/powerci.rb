@@ -17,9 +17,11 @@
 # limitations under the License.
 
 node.override['osl-docker']['service'] = { host: 'tcp://0.0.0.0:2375' }
+node.default['firewall']['docker']['range']['4'] = %w(192.168.6.0/24)
 
 magic_shell_environment 'DOCKER_HOST' do
   value 'tcp://0.0.0.0:2375'
 end
 
 include_recipe 'osl-docker::default'
+include_recipe 'firewall::docker'
