@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+1.2.1 (2017-09-22)
+------------------
+- Add firewall rules for docker on powerci
+
 1.2.0 (2017-09-21)
 ------------------
 - Add ppc64le support / Update to latest Docker-ce version
