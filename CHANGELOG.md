@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+1.2.2 (2017-10-05)
+------------------
+- Expose the docker container ports to the jenkins server on powerci
+
 1.2.1 (2017-09-22)
 ------------------
 - Add firewall rules for docker on powerci
