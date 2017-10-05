@@ -28,6 +28,12 @@ describe 'osl-docker::powerci' do
             ]
           )
       end
+      it do
+        expect(chef_run).to create_iptables_ng_rule('docker_expose_ipv4')
+          .with(
+            rule: ['--protocol tcp --source 192.168.6.0/24 --destination-port 32768:61000 --jump ACCEPT']
+          )
+      end
     end
   end
 end
