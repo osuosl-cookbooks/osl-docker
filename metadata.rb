@@ -9,7 +9,6 @@ long_description 'Installs/Configures osl-docker'
 version          '1.2.2'
 
 depends          'apt'
-depends          'apt-docker'
 depends          'docker', '~> 2.15.0'
 depends          'firewall', '>= 4.4.4'
 depends          'magic_shell'
