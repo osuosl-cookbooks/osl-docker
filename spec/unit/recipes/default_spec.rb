@@ -63,7 +63,7 @@ describe 'osl-docker::default' do
             notify('yum_repository[docker-main]').to(:makecache).immediately
         end
         it do
-          expect(chef_run).to_not include_recipe('apt-docker')
+          expect(chef_run).to_not add_apt_repository('docker-main')
         end
         it do
           expect(chef_run).to_not add_apt_preference('docker-ce')
@@ -73,7 +73,14 @@ describe 'osl-docker::default' do
           expect(chef_run).to create_docker_installation_package('default').with(version: '17.05.0')
         end
         it do
-          expect(chef_run).to include_recipe('apt-docker')
+          expect(chef_run).to add_apt_repository('docker-main')
+            .with(
+              uri: 'https://apt.dockerproject.org/repo',
+              components: %w(main),
+              keyserver: 'hkp://p80.pool.sks-keyservers.net:80',
+              distribution: 'debian-jessie',
+              key: '58118E89F3A912897C070ADBF76221572C52609D'
+            )
         end
         it do
           expect(chef_run).to add_apt_preference('docker-engine')

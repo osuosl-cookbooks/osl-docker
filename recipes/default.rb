@@ -39,7 +39,14 @@ if node['platform_family'] == 'rhel'
 
 end
 
-include_recipe 'apt-docker' if node['platform_family'] == 'debian'
+apt_repository 'docker-main' do
+  uri 'https://apt.dockerproject.org/repo'
+  components %w(main)
+  keyserver 'hkp://p80.pool.sks-keyservers.net:80'
+  distribution "#{node['platform']}-#{node['lsb']['codename']}"
+  key '58118E89F3A912897C070ADBF76221572C52609D'
+  only_if { node['platform_family'] == 'debian' }
+end
 
 apt_preference node['osl-docker']['package']['package_name'] do
   pin "version #{node['osl-docker']['package']['version']}*"
