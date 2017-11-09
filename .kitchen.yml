@@ -8,3 +8,8 @@ suites:
       - recipe[osl-docker::powerci]
     excludes:
       - debian-8
+  - name: workstation
+    run_list:
+      - recipe[osl-docker::workstation]
+    excludes:
+      - centos-7.4

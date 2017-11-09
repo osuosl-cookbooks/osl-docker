@@ -18,6 +18,10 @@ ALL_PLATFORMS = [
   DEBIAN_8
 ].freeze
 
+DEBIAN_PLATFORMS = [
+  DEBIAN_8
+].freeze
+
 RSpec.configure do |config|
   config.log_level = :fatal
 end
