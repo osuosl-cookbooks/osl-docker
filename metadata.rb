@@ -10,7 +10,7 @@ version          '1.2.3'
 
 depends          'apt'
 depends          'docker', '~> 2.15.0'
-depends          'firewall', '>= 4.4.4'
+depends          'firewall'
 depends          'magic_shell'
 depends          'yum-docker'
 depends          'yum-plugin-versionlock'
