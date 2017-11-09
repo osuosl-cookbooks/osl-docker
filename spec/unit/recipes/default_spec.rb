@@ -15,6 +15,19 @@ describe 'osl-docker::default' do
       it do
         expect(chef_run).to start_docker_service('default')
       end
+      it do
+        expect(chef_run).to_not add_magic_shell_environment('DOCKER_HOST')
+      end
+      context 'DOCKER_HOST set' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p) do |node|
+            node.set['osl-docker']['service']['host'] = 'tcp://127.0.0.1:2375'
+          end.converge(described_recipe)
+        end
+        it do
+          expect(chef_run).to add_magic_shell_environment('DOCKER_HOST').with(value: 'tcp://127.0.0.1:2375')
+        end
+      end
       case p
       when CENTOS_7
         it do

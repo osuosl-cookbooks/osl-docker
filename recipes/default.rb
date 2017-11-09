@@ -72,3 +72,8 @@ docker_service 'default' do
   end
   action [:create, :start]
 end
+
+magic_shell_environment 'DOCKER_HOST' do
+  value node['osl-docker']['service']['host']
+  only_if { node['osl-docker']['service']['host'] }
+end
