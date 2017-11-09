@@ -1,7 +1,7 @@
 require_relative '../../spec_helper'
 
 describe 'osl-docker::powerci' do
-  ALL_PLATFORMS.each do |p|
+  CENTOS_PLATFORMS.each do |p|
     context "#{p[:platform]} #{p[:version]}" do
       cached(:chef_run) do
         ChefSpec::SoloRunner.new(p).converge(described_recipe)

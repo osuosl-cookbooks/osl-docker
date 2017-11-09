@@ -18,6 +18,10 @@ ALL_PLATFORMS = [
   DEBIAN_8
 ].freeze
 
+CENTOS_PLATFORMS = [
+  CENTOS_7
+].freeze
+
 DEBIAN_PLATFORMS = [
   DEBIAN_8
 ].freeze
