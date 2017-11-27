@@ -39,12 +39,17 @@ if node['platform_family'] == 'rhel'
 
 end
 
+# Needed on Debian 9 to import the GPG key
+package 'dirmngr' do
+  only_if { node['platform_family'] == 'debian' && node['platform_version'].to_i >= 9 }
+end
+
 apt_repository 'docker-main' do
-  uri 'https://apt.dockerproject.org/repo'
-  components %w(main)
+  uri 'https://download.docker.com/linux/debian'
+  components %w(stable)
+  distribution node['lsb']['codename']
   keyserver 'hkp://p80.pool.sks-keyservers.net:80'
-  distribution "#{node['platform']}-#{node['lsb']['codename']}"
-  key '58118E89F3A912897C070ADBF76221572C52609D'
+  key '0EBFCD88'
   only_if { node['platform_family'] == 'debian' }
 end
 
@@ -58,6 +63,7 @@ docker_installation_package 'default' do
   node['osl-docker']['package'].each do |key, value|
     send(key.to_sym, value)
   end
+  notifies :restart, 'docker_service[default]'
 end
 
 docker_service 'default' do
