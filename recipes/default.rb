@@ -72,3 +72,22 @@ docker_service 'default' do
   end
   action [:create, :start]
 end
+
+magic_shell_environment 'DOCKER_HOST' do
+  value node['osl-docker']['service']['host']
+  only_if { node['osl-docker']['service']['host'] }
+end
+
+cron 'docker_prune_volumes' do
+  minute 15
+  environment(DOCKER_HOST: node['osl-docker']['service']['host']) if node['osl-docker']['service']['host']
+  command '/usr/bin/docker system prune --volumes -f > /dev/null'
+end
+
+cron 'docker_prune_images' do
+  minute 45
+  hour 2
+  weekday 0
+  environment(DOCKER_HOST: node['osl-docker']['service']['host']) if node['osl-docker']['service']['host']
+  command '/usr/bin/docker system prune -a -f > /dev/null'
+end

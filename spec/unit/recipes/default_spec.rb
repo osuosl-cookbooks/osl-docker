@@ -15,6 +15,55 @@ describe 'osl-docker::default' do
       it do
         expect(chef_run).to start_docker_service('default')
       end
+      it do
+        expect(chef_run).to_not add_magic_shell_environment('DOCKER_HOST')
+      end
+      it do
+        expect(chef_run).to create_cron('docker_prune_volumes')
+          .with(
+            minute: '15',
+            environment: {},
+            command: '/usr/bin/docker system prune --volumes -f > /dev/null'
+          )
+      end
+      it do
+        expect(chef_run).to create_cron('docker_prune_images')
+          .with(
+            minute: '45',
+            hour: '2',
+            weekday: '0',
+            environment: {},
+            command: '/usr/bin/docker system prune -a -f > /dev/null'
+          )
+      end
+      context 'DOCKER_HOST set' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p) do |node|
+            node.set['osl-docker']['service']['host'] = 'tcp://127.0.0.1:2375'
+          end.converge(described_recipe)
+        end
+        it do
+          expect(chef_run).to add_magic_shell_environment('DOCKER_HOST').with(value: 'tcp://127.0.0.1:2375')
+        end
+        it do
+          expect(chef_run).to create_cron('docker_prune_volumes')
+            .with(
+              minute: '15',
+              environment: { DOCKER_HOST: 'tcp://127.0.0.1:2375' },
+              command: '/usr/bin/docker system prune --volumes -f > /dev/null'
+            )
+        end
+        it do
+          expect(chef_run).to create_cron('docker_prune_images')
+            .with(
+              minute: '45',
+              hour: '2',
+              weekday: '0',
+              environment: { DOCKER_HOST: 'tcp://127.0.0.1:2375' },
+              command: '/usr/bin/docker system prune -a -f > /dev/null'
+            )
+        end
+      end
       case p
       when CENTOS_7
         it do

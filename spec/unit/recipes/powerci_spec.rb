@@ -15,11 +15,6 @@ describe 'osl-docker::powerci' do
         )
       end
       it do
-        expect(chef_run).to add_magic_shell_environment('DOCKER_HOST').with(
-          value: 'tcp://0.0.0.0:2375'
-        )
-      end
-      it do
         expect(chef_run).to create_iptables_ng_rule('docker_ipv4')
           .with(
             rule: [
