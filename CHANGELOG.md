@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+1.4.1 (2017-11-28)
+------------------
+- Prune docker volumes and images via cronjob
+
 1.4.0 (2017-11-27)
 ------------------
 - Bump to docker-ce-17.09.0
