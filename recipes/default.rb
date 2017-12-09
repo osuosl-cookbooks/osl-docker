@@ -15,7 +15,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-if node['platform_family'] == 'rhel'
+if node['platform_family'] == 'rhel' && node['kernel']['machine'] != 's390x'
   include_recipe 'yum-docker'
   include_recipe 'yum-plugin-versionlock'
 
@@ -36,7 +36,6 @@ if node['platform_family'] == 'rhel'
     release node['osl-docker']['package_release']
     notifies :makecache, 'yum_repository[docker-main]', :immediately
   end
-
 end
 
 # Needed on Debian 9 to import the GPG key
@@ -59,10 +58,24 @@ apt_preference node['osl-docker']['package']['package_name'] do
   only_if { node['platform_family'] == 'debian' }
 end
 
+docker_installation_tarball 'default' do
+  node['osl-docker']['tarball'].each do |key, value|
+    send(key.to_sym, value)
+  end
+  only_if { node['kernel']['machine'] == 's390x' }
+  notifies :restart, 'docker_service[default]'
+end
+
+group 'docker' do
+  system true
+  only_if { node['kernel']['machine'] == 's390x' }
+end
+
 docker_installation_package 'default' do
   node['osl-docker']['package'].each do |key, value|
     send(key.to_sym, value)
   end
+  not_if { node['kernel']['machine'] == 's390x' }
   notifies :restart, 'docker_service[default]'
 end
 

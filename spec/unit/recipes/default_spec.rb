@@ -19,6 +19,12 @@ describe 'osl-docker::default' do
         expect(chef_run).to_not add_magic_shell_environment('DOCKER_HOST')
       end
       it do
+        expect(chef_run).to_not create_group('docker')
+      end
+      it do
+        expect(chef_run).to_not create_docker_installation_tarball('default')
+      end
+      it do
         expect(chef_run).to create_cron('docker_prune_volumes')
           .with(
             minute: '15',
@@ -83,6 +89,35 @@ describe 'osl-docker::default' do
               )
           end
         end
+        context 's390x' do
+          cached(:chef_run) do
+            ChefSpec::SoloRunner.new(p) do |node|
+              node.automatic['kernel']['machine'] = 's390x'
+            end.converge(described_recipe)
+          end
+          it do
+            expect(chef_run).to_not create_yum_repository('docker-main')
+          end
+          %w(yum-docker yum-plugin-versionlock).each do |r|
+            it do
+              expect(chef_run).to_not include_recipe(r)
+            end
+          end
+          it do
+            expect(chef_run).to_not add_yum_version_lock('docker-ce')
+          end
+          it do
+            expect(chef_run).to create_docker_installation_tarball('default')
+              .with(
+                version: '17.09.0',
+                checksum: '6037fbd5e22d68fde6ddf73a28c10b5c37d916b02b6848a3cb62344ced137365',
+                source: 'https://download.docker.com/linux/static/stable/s390x/docker-17.09.0-ce.tgz'
+              )
+          end
+          it do
+            expect(chef_run).to create_group('docker').with(system: true)
+          end
+        end
         it do
           expect(chef_run).to create_yum_repository('docker-main')
             .with(
@@ -90,8 +125,10 @@ describe 'osl-docker::default' do
               gpgkey: 'https://download.docker.com/linux/centos/gpg'
             )
         end
-        it do
-          expect(chef_run).to include_recipe('yum-docker')
+        %w(yum-docker yum-plugin-versionlock).each do |r|
+          it do
+            expect(chef_run).to include_recipe(r)
+          end
         end
         it do
           expect(chef_run).to add_yum_version_lock('docker-ce')
