@@ -13,7 +13,9 @@ describe cron do
 end
 
 describe iptables do
-  it { should have_rule('-A docker -s 192.168.6.0/24 -p tcp -m tcp --dport 2375 -j ACCEPT') }
-  it { should have_rule('-A docker -s 192.168.6.0/24 -p tcp -m tcp --dport 2376 -j ACCEPT') }
-  it { should have_rule('-A docker -s 192.168.6.0/24 -p tcp -m tcp --dport 32768:61000 -j ACCEPT') }
+  ['192.168.6.0/24', '140.211.168.207/32'].each do |ip|
+    it { should have_rule("-A docker -s #{ip} -p tcp -m tcp --dport 2375 -j ACCEPT") }
+    it { should have_rule("-A docker -s #{ip} -p tcp -m tcp --dport 2376 -j ACCEPT") }
+    it { should have_rule("-A docker -s #{ip} -p tcp -m tcp --dport 32768:61000 -j ACCEPT") }
+  end
 end
