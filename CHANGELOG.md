@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+1.4.3 (2017-12-12)
+------------------
+- Allow access to docker from powerci-jenkins host
+
 1.4.2 (2017-12-09)
 ------------------
 - s390x support via tarball installation method
