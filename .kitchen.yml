@@ -3,6 +3,9 @@ suites:
   - name: default
     run_list:
       - recipe[osl-docker::default]
+  - name: compose
+    run_list:
+      - recipe[osl-docker::compose]
   - name: powerci
     run_list:
       - recipe[osl-docker::powerci]
