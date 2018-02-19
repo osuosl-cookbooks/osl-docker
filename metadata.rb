@@ -6,7 +6,7 @@ issues_url       'https://github.com/osuosl-cookbooks/osl-docker/issues'
 source_url       'https://github.com/osuosl-cookbooks/osl-docker'
 description      'Installs/Configures osl-docker'
 long_description 'Installs/Configures osl-docker'
-version          '1.4.3'
+version          '1.5.0'
 
 depends          'apt'
 depends          'docker', '~> 2.15.0'
