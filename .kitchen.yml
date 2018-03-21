@@ -1,8 +1,24 @@
 ---
+driver_config:
+  user_data: userdata.txt
+
+provisioner:
+  name: chef_solo
+  data_bags_path: test/integration/data_bags
+  encrypted_data_bag_secret_key_path: test/integration/encrypted_data_bag_secret
+
 suites:
   - name: default
     run_list:
       - recipe[osl-docker::default]
+  - name: default_tls
+    run_list:
+      - recipe[osl-docker::default]
+    attributes:
+      osl-docker:
+        tls: true
+    driver_config:
+      server_name: default_tls
   - name: compose
     run_list:
       - recipe[osl-docker::compose]

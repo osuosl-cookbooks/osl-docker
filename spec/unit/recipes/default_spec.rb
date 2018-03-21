@@ -25,6 +25,21 @@ describe 'osl-docker::default' do
         expect(chef_run).to_not create_docker_installation_tarball('default')
       end
       it do
+        expect(chef_run).to_not create_directory('/etc/docker/ssl')
+      end
+      it do
+        expect(chef_run).to_not create_certificate_manage('server-fauxhai-local')
+      end
+      it do
+        expect(chef_run).to_not create_certificate_manage('client-fauxhai-local')
+      end
+      it do
+        expect(chef_run).to_not add_magic_shell_environment('DOCKER_TLS_VERIFY').with(value: '1')
+      end
+      it do
+        expect(chef_run).to_not add_magic_shell_environment('DOCKER_CERT_PATH').with(value: '/etc/docker/ssl')
+      end
+      it do
         expect(chef_run).to create_cron('docker_prune_volumes')
           .with(
             minute: '15',
@@ -67,6 +82,71 @@ describe 'osl-docker::default' do
               weekday: '0',
               environment: { DOCKER_HOST: 'tcp://127.0.0.1:2375' },
               command: '/usr/bin/docker system prune -a -f > /dev/null'
+            )
+        end
+      end
+      context 'Enable TLS' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p) do |node|
+            node.set['osl-docker']['tls'] = true
+          end.converge(described_recipe)
+        end
+        it do
+          expect(chef_run).to create_directory('/etc/docker/ssl')
+            .with(
+              owner: 'root',
+              group: 'docker',
+              mode: '0750',
+              recursive: true
+            )
+        end
+        it do
+          expect(chef_run).to create_certificate_manage('server-fauxhai-local')
+            .with(
+              data_bag: 'docker',
+              cert_path: '/etc/docker/ssl',
+              chain_file: 'ca.pem',
+              cert_file: 'server.pem',
+              key_file: 'server-key.pem',
+              owner: 'root',
+              group: 'docker',
+              create_subfolders: false
+            )
+        end
+        it do
+          expect(chef_run.certificate_manage('server-fauxhai-local')).to notify('docker_service[default]').to(:restart)
+        end
+        it do
+          expect(chef_run).to create_certificate_manage('client-fauxhai-local')
+            .with(
+              data_bag: 'docker',
+              cert_path: '/etc/docker/ssl',
+              chain_file: 'ca.pem',
+              cert_file: 'cert.pem',
+              key_file: 'key.pem',
+              owner: 'root',
+              group: 'docker',
+              create_subfolders: false
+            )
+        end
+        it do
+          expect(chef_run).to add_magic_shell_environment('DOCKER_HOST').with(value: 'tcp://127.0.0.1:2376')
+        end
+        it do
+          expect(chef_run).to add_magic_shell_environment('DOCKER_TLS_VERIFY').with(value: '1')
+        end
+        it do
+          expect(chef_run).to add_magic_shell_environment('DOCKER_CERT_PATH').with(value: '/etc/docker/ssl')
+        end
+        it do
+          expect(chef_run).to create_docker_service('default')
+            .with(
+              tls_verify: true,
+              tls_ca_cert: '/etc/docker/ssl/ca.pem',
+              tls_server_cert: '/etc/docker/ssl/server.pem',
+              tls_server_key: '/etc/docker/ssl/server-key.pem',
+              tls_client_cert: '/etc/docker/ssl/cert.pem',
+              tls_client_key: '/etc/docker/ssl/key.pem'
             )
         end
       end
