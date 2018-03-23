@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+1.6.0 (2018-03-23)
+------------------
+- Optional TLS support for docker daemons
+
 1.5.0 (2018-02-19)
 ------------------
 - Install docker-compose binary
