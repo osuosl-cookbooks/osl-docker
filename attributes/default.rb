@@ -20,3 +20,5 @@ else
   default['osl-docker']['tarball'] = {}
 end
 default['osl-docker']['service'] = {}
+default['osl-docker']['tls'] = false
+default['osl-docker']['data_bag'] = 'docker'

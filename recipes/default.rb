@@ -79,16 +79,69 @@ docker_installation_package 'default' do
   notifies :restart, 'docker_service[default]'
 end
 
-docker_service 'default' do
-  node['osl-docker']['service'].each do |key, value|
-    send(key.to_sym, value)
-  end
-  action [:create, :start]
+directory '/etc/docker/ssl' do
+  owner 'root'
+  group 'docker'
+  mode '0750'
+  recursive true
+  only_if { node['osl-docker']['tls'] }
 end
+
+certificate_manage "server-#{node['fqdn'].tr('.', '-')}" do
+  data_bag node['osl-docker']['data_bag']
+  cert_path '/etc/docker/ssl'
+  chain_file 'ca.pem'
+  cert_file 'server.pem'
+  key_file 'server-key.pem'
+  owner 'root'
+  group 'docker'
+  create_subfolders false
+  only_if { node['osl-docker']['tls'] }
+  notifies :restart, 'docker_service[default]'
+end
+
+certificate_manage "client-#{node['fqdn'].tr('.', '-')}" do
+  data_bag node['osl-docker']['data_bag']
+  cert_path '/etc/docker/ssl'
+  chain_file 'ca.pem'
+  cert_file 'cert.pem'
+  key_file 'key.pem'
+  owner 'root'
+  group 'docker'
+  create_subfolders false
+  only_if { node['osl-docker']['tls'] }
+end
+
+node.default['osl-docker']['service']['host'] = 'tcp://127.0.0.1:2376' if node['osl-docker']['tls']
 
 magic_shell_environment 'DOCKER_HOST' do
   value node['osl-docker']['service']['host']
   only_if { node['osl-docker']['service']['host'] }
+end
+
+magic_shell_environment 'DOCKER_TLS_VERIFY' do
+  value '1'
+  only_if { node['osl-docker']['tls'] }
+end
+
+magic_shell_environment 'DOCKER_CERT_PATH' do
+  value '/etc/docker/ssl'
+  only_if { node['osl-docker']['tls'] }
+end
+
+docker_service 'default' do
+  node['osl-docker']['service'].each do |key, value|
+    send(key.to_sym, value)
+  end
+  if node['osl-docker']['tls']
+    tls_verify true
+    tls_ca_cert '/etc/docker/ssl/ca.pem'
+    tls_server_cert '/etc/docker/ssl/server.pem'
+    tls_server_key '/etc/docker/ssl/server-key.pem'
+    tls_client_cert '/etc/docker/ssl/cert.pem'
+    tls_client_key '/etc/docker/ssl/key.pem'
+  end
+  action [:create, :start]
 end
 
 cron 'docker_prune_volumes' do
