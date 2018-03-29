@@ -28,6 +28,14 @@ suites:
     excludes:
       - debian-8
       - debian-9
+  - name: ibmz_ci
+    run_list:
+      - recipe[osl-docker::ibmz_ci]
+    driver_config:
+      server_name: ibmz_ci
+    excludes:
+      - debian-8
+      - debian-9
   - name: workstation
     run_list:
       - recipe[osl-docker::workstation]
