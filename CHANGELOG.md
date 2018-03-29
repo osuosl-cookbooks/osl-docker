@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+1.7.0 (2018-03-29)
+------------------
+- IBM-Z CI docker recipe
+
 1.6.0 (2018-03-23)
 ------------------
 - Optional TLS support for docker daemons
