@@ -8,7 +8,7 @@ description      'Installs/Configures osl-docker'
 long_description 'Installs/Configures osl-docker'
 version          '1.7.0'
 
-depends          'apt'
+depends          'apt', '< 7.0.0'
 depends          'certificate'
 depends          'docker', '~> 2.15.0'
 depends          'firewall', '>= 4.4.4'
