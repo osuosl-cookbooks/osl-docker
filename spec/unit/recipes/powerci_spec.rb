@@ -34,6 +34,9 @@ describe 'osl-docker::powerci' do
             ]
           )
       end
+      it do
+        expect(chef_run).to create_docker_volume('ccache')
+      end
     end
   end
 end
