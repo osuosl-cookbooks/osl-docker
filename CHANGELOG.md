@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+1.7.2 (2018-04-18)
+------------------
+- Enable docker socket by default
+
 1.7.1 (2018-04-10)
 ------------------
 - Lock apt cookbook to < 7.0.0
