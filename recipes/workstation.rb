@@ -15,15 +15,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-node.override['osl-docker']['service'] = { host: 'tcp://127.0.0.1:2375' }
+node.override['osl-docker']['host'] = 'tcp://127.0.0.1:2375'
 
 magic_shell_environment 'DOCKER_HOST' do
   value 'tcp://127.0.0.1:2375'
-end
-
-# cleanup old config from workstation::docker
-systemd_socket 'docker' do
-  action [:delete]
 end
 
 include_recipe 'osl-docker::default'

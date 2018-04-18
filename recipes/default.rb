@@ -112,11 +112,12 @@ certificate_manage "client-#{node['fqdn'].tr('.', '-')}" do
   only_if { node['osl-docker']['tls'] }
 end
 
-node.default['osl-docker']['service']['host'] = 'tcp://127.0.0.1:2376' if node['osl-docker']['tls']
+node.default['osl-docker']['service']['host'] = ['unix:///var/run/docker.sock']
+node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'].nil?
 
 magic_shell_environment 'DOCKER_HOST' do
-  value node['osl-docker']['service']['host']
-  only_if { node['osl-docker']['service']['host'] }
+  value node['osl-docker']['host']
+  only_if { node['osl-docker']['host'] }
 end
 
 magic_shell_environment 'DOCKER_TLS_VERIFY' do
@@ -146,7 +147,7 @@ end
 
 cron 'docker_prune_volumes' do
   minute 15
-  environment(DOCKER_HOST: node['osl-docker']['service']['host']) if node['osl-docker']['service']['host']
+  environment(DOCKER_HOST: node['osl-docker']['host']) if node['osl-docker']['host']
   command '/usr/bin/docker system prune --volumes -f > /dev/null'
 end
 
@@ -154,6 +155,6 @@ cron 'docker_prune_images' do
   minute 45
   hour 2
   weekday 0
-  environment(DOCKER_HOST: node['osl-docker']['service']['host']) if node['osl-docker']['service']['host']
+  environment(DOCKER_HOST: node['osl-docker']['host']) if node['osl-docker']['host']
   command '/usr/bin/docker system prune -a -f > /dev/null'
 end
