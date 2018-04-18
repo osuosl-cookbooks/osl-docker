@@ -11,7 +11,7 @@ describe 'osl-docker::powerci' do
       end
       it do
         expect(chef_run).to create_docker_service('default').with(
-          host: ['tcp://0.0.0.0:2375']
+          host: ['unix:///var/run/docker.sock', 'tcp://0.0.0.0:2375']
         )
       end
       it do

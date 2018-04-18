@@ -17,7 +17,7 @@
 # limitations under the License.
 node.default['firewall']['docker']['expose_ports'] = true
 node.default['osl-docker']['tls'] = true
-node.override['osl-docker']['service'] = { host: 'tcp://0.0.0.0:2376' }
+node.override['osl-docker']['host'] = 'tcp://0.0.0.0:2376'
 
 include_recipe 'osl-docker::default'
 include_recipe 'firewall::docker'

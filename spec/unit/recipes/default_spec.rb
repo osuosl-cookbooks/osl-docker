@@ -60,7 +60,7 @@ describe 'osl-docker::default' do
       context 'DOCKER_HOST set' do
         cached(:chef_run) do
           ChefSpec::SoloRunner.new(p) do |node|
-            node.set['osl-docker']['service']['host'] = 'tcp://127.0.0.1:2375'
+            node.set['osl-docker']['host'] = 'tcp://127.0.0.1:2375'
           end.converge(described_recipe)
         end
         it do

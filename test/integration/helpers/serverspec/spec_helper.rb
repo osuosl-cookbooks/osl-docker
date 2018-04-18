@@ -14,4 +14,8 @@ shared_examples_for 'docker' do |docker_env|
   describe command("#{docker_env} docker ps") do
     its(:exit_status) { should eq 0 }
   end
+
+  describe command('docker ps') do
+    its(:exit_status) { should eq 0 }
+  end
 end
