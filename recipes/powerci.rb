@@ -22,3 +22,5 @@ node.default['firewall']['docker']['expose_ports'] = true
 
 include_recipe 'osl-docker::default'
 include_recipe 'firewall::docker'
+
+docker_volume 'ccache'

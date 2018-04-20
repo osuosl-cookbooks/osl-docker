@@ -19,3 +19,9 @@ describe iptables do
     it { should have_rule("-A docker -s #{ip} -p tcp -m tcp --dport 32768:61000 -j ACCEPT") }
   end
 end
+
+describe command('docker volume inspect ccache') do
+  its(:exit_status) { should eq 0 }
+  its(:stdout) { should match(%r{"Mountpoint": "/var/lib/docker/volumes/ccache/_data"}) }
+  its(:stdout) { should match(/"Name": "ccache"/) }
+end
