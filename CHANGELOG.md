@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+1.7.3 (2018-04-20)
+------------------
+- Add ccache volume on POWER/IBM-Z CI
+
 1.7.2 (2018-04-18)
 ------------------
 - Enable docker socket by default
