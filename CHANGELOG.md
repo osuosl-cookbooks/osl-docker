@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+1.7.4 (2018-05-15)
+------------------
+- Remove DOCKER_HOST from cron jobs
+
 1.7.3 (2018-04-20)
 ------------------
 - Add ccache volume on POWER/IBM-Z CI
