@@ -8,6 +8,11 @@ describe port(2375) do
   it { should be_listening }
 end
 
+describe cron do
+  its(:table) { should match(%r{/usr/bin/docker system prune --volumes -f --filter label!=preserve=true > /dev/null}) }
+  its(:table) { should match(%r{/usr/bin/docker system prune -a -f --filter label!=preserve=true > /dev/null}) }
+end
+
 describe iptables do
   ['192.168.6.0/24', '140.211.168.207/32'].each do |ip|
     it { should have_rule("-A docker -s #{ip} -p tcp -m tcp --dport 2375 -j ACCEPT") }

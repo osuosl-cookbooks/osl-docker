@@ -18,6 +18,18 @@ describe 'osl-docker::ibmz_ci' do
         )
       end
       it do
+        expect(chef_run).to create_cron('docker_prune_volumes')
+          .with(
+            command: '/usr/bin/docker system prune --volumes -f --filter label!=preserve=true > /dev/null'
+          )
+      end
+      it do
+        expect(chef_run).to create_cron('docker_prune_images')
+          .with(
+            command: '/usr/bin/docker system prune -a -f --filter label!=preserve=true > /dev/null'
+          )
+      end
+      it do
         expect(chef_run).to run_execute('docker volume create --label preserve=true ccache')
       end
       context 'ccache volume already exists' do

@@ -10,6 +10,11 @@ describe port(2376) do
   it { should be_listening }
 end
 
+describe cron do
+  its(:table) { should match(%r{/usr/bin/docker system prune --volumes -f --filter label!=preserve=true > /dev/null}) }
+  its(:table) { should match(%r{/usr/bin/docker system prune -a -f --filter label!=preserve=true > /dev/null}) }
+end
+
 describe command('docker volume inspect ccache') do
   its(:exit_status) { should eq 0 }
   its(:stdout) { should match(%r{"Mountpoint": "/var/lib/docker/volumes/ccache/_data"}) }

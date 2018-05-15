@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 node.default['firewall']['docker']['expose_ports'] = true
+node.default['osl-docker']['prune']['volume_filter'] = %w(label!=preserve=true)
 node.default['osl-docker']['tls'] = true
 node.override['osl-docker']['host'] = 'tcp://0.0.0.0:2376'
 

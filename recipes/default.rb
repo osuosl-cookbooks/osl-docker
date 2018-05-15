@@ -145,14 +145,21 @@ docker_service 'default' do
   action [:create, :start]
 end
 
+volume_filter = []
+unless node['osl-docker']['prune']['volume_filter'].empty?
+  node['osl-docker']['prune']['volume_filter'].each do |f|
+    volume_filter << "--filter #{f}"
+  end
+end
+
 cron 'docker_prune_volumes' do
   minute 15
-  command '/usr/bin/docker system prune --volumes -f > /dev/null'
+  command "/usr/bin/docker system prune --volumes -f #{volume_filter.join(' ')} > /dev/null"
 end
 
 cron 'docker_prune_images' do
   minute 45
   hour 2
   weekday 0
-  command '/usr/bin/docker system prune -a -f > /dev/null'
+  command "/usr/bin/docker system prune -a -f #{volume_filter.join(' ')} > /dev/null"
 end

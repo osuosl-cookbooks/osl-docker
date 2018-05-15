@@ -18,6 +18,18 @@ describe 'osl-docker::powerci' do
         )
       end
       it do
+        expect(chef_run).to create_cron('docker_prune_volumes')
+          .with(
+            command: '/usr/bin/docker system prune --volumes -f --filter label!=preserve=true > /dev/null'
+          )
+      end
+      it do
+        expect(chef_run).to create_cron('docker_prune_images')
+          .with(
+            command: '/usr/bin/docker system prune -a -f --filter label!=preserve=true > /dev/null'
+          )
+      end
+      it do
         expect(chef_run).to create_iptables_ng_rule('docker_ipv4')
           .with(
             rule: [
