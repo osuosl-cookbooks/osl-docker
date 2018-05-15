@@ -23,4 +23,7 @@ node.default['firewall']['docker']['expose_ports'] = true
 include_recipe 'osl-docker::default'
 include_recipe 'firewall::docker'
 
-docker_volume 'ccache'
+# docker_volume resource does not have support for labels
+execute 'docker volume create --label preserve=true ccache' do
+  not_if 'docker volume inspect ccache'
+end

@@ -6,6 +6,9 @@ describe 'osl-docker::powerci' do
       cached(:chef_run) do
         ChefSpec::SoloRunner.new(p).converge(described_recipe)
       end
+      before do
+        stub_command('docker volume inspect ccache').and_return(false)
+      end
       it 'converges successfully' do
         expect { chef_run }.to_not raise_error
       end
@@ -35,7 +38,18 @@ describe 'osl-docker::powerci' do
           )
       end
       it do
-        expect(chef_run).to create_docker_volume('ccache')
+        expect(chef_run).to run_execute('docker volume create --label preserve=true ccache')
+      end
+      context 'ccache volume already exists' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p).converge(described_recipe)
+        end
+        before do
+          stub_command('docker volume inspect ccache').and_return(true)
+        end
+        it do
+          expect(chef_run).to_not run_execute('docker volume create --label preserve=true ccache')
+        end
       end
     end
   end
