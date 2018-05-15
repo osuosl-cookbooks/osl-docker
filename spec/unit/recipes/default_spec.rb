@@ -70,7 +70,6 @@ describe 'osl-docker::default' do
           expect(chef_run).to create_cron('docker_prune_volumes')
             .with(
               minute: '15',
-              environment: { DOCKER_HOST: 'tcp://127.0.0.1:2375' },
               command: '/usr/bin/docker system prune --volumes -f > /dev/null'
             )
         end
@@ -80,7 +79,6 @@ describe 'osl-docker::default' do
               minute: '45',
               hour: '2',
               weekday: '0',
-              environment: { DOCKER_HOST: 'tcp://127.0.0.1:2375' },
               command: '/usr/bin/docker system prune -a -f > /dev/null'
             )
         end
