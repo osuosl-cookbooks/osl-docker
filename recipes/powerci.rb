@@ -17,10 +17,14 @@
 # limitations under the License.
 
 node.override['osl-docker']['host'] = 'tcp://0.0.0.0:2375'
+node.default['osl-docker']['prune']['volume_filter'] = %w(label!=preserve=true)
 node.default['firewall']['docker']['range']['4'] = %w(192.168.6.0/24 140.211.168.207/32)
 node.default['firewall']['docker']['expose_ports'] = true
 
 include_recipe 'osl-docker::default'
 include_recipe 'firewall::docker'
 
-docker_volume 'ccache'
+# docker_volume resource does not have support for labels
+execute 'docker volume create --label preserve=true ccache' do
+  not_if 'docker volume inspect ccache'
+end

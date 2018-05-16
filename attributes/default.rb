@@ -20,6 +20,7 @@ else
   default['osl-docker']['tarball'] = {}
 end
 default['osl-docker']['service'] = {}
+default['osl-docker']['prune']['volume_filter'] = []
 default['osl-docker']['tls'] = false
 default['osl-docker']['host'] = node['osl-docker']['tls'] ? 'tcp://127.0.0.1:2376' : nil
 default['osl-docker']['data_bag'] = 'docker'

@@ -9,7 +9,8 @@ describe port(2375) do
 end
 
 describe cron do
-  its(:table) { should match(%r{^DOCKER_HOST=tcp://0\.0\.0\.0:2375$}) }
+  its(:table) { should match(%r{/usr/bin/docker system prune --volumes -f --filter label!=preserve=true > /dev/null}) }
+  its(:table) { should match(%r{/usr/bin/docker system prune -a -f --filter label!=preserve=true > /dev/null}) }
 end
 
 describe iptables do
@@ -24,4 +25,5 @@ describe command('docker volume inspect ccache') do
   its(:exit_status) { should eq 0 }
   its(:stdout) { should match(%r{"Mountpoint": "/var/lib/docker/volumes/ccache/_data"}) }
   its(:stdout) { should match(/"Name": "ccache"/) }
+  its(:stdout) { should match(/"Labels": {\n.*"preserve": "true"/) }
 end
