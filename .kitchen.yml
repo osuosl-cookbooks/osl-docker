@@ -40,4 +40,4 @@ suites:
     run_list:
       - recipe[osl-docker::workstation]
     excludes:
-      - centos-7.4
+      - centos-7
