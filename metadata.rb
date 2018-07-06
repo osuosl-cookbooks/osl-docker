@@ -14,7 +14,7 @@ depends          'docker', '~> 2.15.0'
 depends          'firewall', '>= 4.4.4'
 depends          'systemd', '< 3.0.0'
 depends          'magic_shell'
-depends          'yum-docker'
+depends          'chef-yum-docker', '~> 3.1.1'
 depends          'yum-plugin-versionlock'
 
 supports         'centos', '~> 7.0'

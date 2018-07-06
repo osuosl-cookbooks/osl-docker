@@ -60,7 +60,7 @@ describe 'osl-docker::default' do
       context 'DOCKER_HOST set' do
         cached(:chef_run) do
           ChefSpec::SoloRunner.new(p) do |node|
-            node.set['osl-docker']['host'] = 'tcp://127.0.0.1:2375'
+            node.normal['osl-docker']['host'] = 'tcp://127.0.0.1:2375'
           end.converge(described_recipe)
         end
         it do
@@ -86,7 +86,7 @@ describe 'osl-docker::default' do
       context 'Enable TLS' do
         cached(:chef_run) do
           ChefSpec::SoloRunner.new(p) do |node|
-            node.set['osl-docker']['tls'] = true
+            node.normal['osl-docker']['tls'] = true
           end.converge(described_recipe)
         end
         it do
@@ -160,7 +160,7 @@ describe 'osl-docker::default' do
             end.converge(described_recipe)
           end
           it do
-            expect(chef_run).to create_yum_repository('docker-main')
+            expect(chef_run).to create_yum_repository('docker-stable')
               .with(
                 baseurl: 'http://ftp.unicamp.br/pub/ppc64el/rhel/7/docker-ppc64el/',
                 gpgcheck: false
@@ -174,7 +174,7 @@ describe 'osl-docker::default' do
             end.converge(described_recipe)
           end
           it do
-            expect(chef_run).to_not create_yum_repository('docker-main')
+            expect(chef_run).to_not create_yum_repository('docker-stable')
           end
           %w(yum-docker yum-plugin-versionlock).each do |r|
             it do
@@ -197,13 +197,13 @@ describe 'osl-docker::default' do
           end
         end
         it do
-          expect(chef_run).to create_yum_repository('docker-main')
+          expect(chef_run).to create_yum_repository('docker-stable')
             .with(
-              baseurl: 'https://download.docker.com/linux/centos/7/x86_64/stable/',
+              baseurl: 'https://download.docker.com/linux/centos/7/x86_64/stable',
               gpgkey: 'https://download.docker.com/linux/centos/gpg'
             )
         end
-        %w(yum-docker yum-plugin-versionlock).each do |r|
+        %w(chef-yum-docker yum-plugin-versionlock).each do |r|
           it do
             expect(chef_run).to include_recipe(r)
           end
@@ -217,10 +217,10 @@ describe 'osl-docker::default' do
         end
         it do
           expect(chef_run.yum_version_lock('docker-ce')).to \
-            notify('yum_repository[docker-main]').to(:makecache).immediately
+            notify('yum_repository[docker-stable]').to(:makecache).immediately
         end
         it do
-          expect(chef_run).to_not add_apt_repository('docker-main')
+          expect(chef_run).to_not add_apt_repository('docker-stable')
         end
         it do
           expect(chef_run).to_not add_apt_preference('docker-ce')
@@ -233,7 +233,7 @@ describe 'osl-docker::default' do
           expect(chef_run).to create_docker_installation_package('default').with(version: '17.09.0')
         end
         it do
-          expect(chef_run).to add_apt_repository('docker-main')
+          expect(chef_run).to add_apt_repository('docker-stable')
             .with(
               uri: 'https://download.docker.com/linux/debian',
               components: %w(stable),
@@ -250,7 +250,7 @@ describe 'osl-docker::default' do
             )
         end
         it do
-          expect(chef_run).to_not include_recipe('yum-docker')
+          expect(chef_run).to_not include_recipe('chef-yum-docker')
         end
         it do
           expect(chef_run).to_not add_yum_version_lock('docker-engine')

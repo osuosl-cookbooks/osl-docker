@@ -17,8 +17,4 @@
 # limitations under the License.
 node.override['osl-docker']['host'] = 'tcp://127.0.0.1:2375'
 
-magic_shell_environment 'DOCKER_HOST' do
-  value 'tcp://127.0.0.1:2375'
-end
-
 include_recipe 'osl-docker::default'

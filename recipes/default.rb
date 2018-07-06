@@ -16,25 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 if node['platform_family'] == 'rhel' && node['kernel']['machine'] != 's390x'
-  include_recipe 'yum-docker'
+  include_recipe 'chef-yum-docker'
   include_recipe 'yum-plugin-versionlock'
 
   if node['kernel']['machine'] == 'ppc64le'
-    edit_resource(:yum_repository, 'docker-main') do
+    edit_resource(:yum_repository, 'docker-stable') do
       baseurl 'http://ftp.unicamp.br/pub/ppc64el/rhel/7/docker-ppc64el/'
       gpgcheck false
-    end
-  else
-    edit_resource(:yum_repository, 'docker-main') do
-      baseurl 'https://download.docker.com/linux/centos/7/x86_64/stable/'
-      gpgkey 'https://download.docker.com/linux/centos/gpg'
     end
   end
 
   yum_version_lock node['osl-docker']['package']['package_name'] do
     version node['osl-docker']['package']['version']
     release node['osl-docker']['package_release']
-    notifies :makecache, 'yum_repository[docker-main]', :immediately
+    notifies :makecache, 'yum_repository[docker-stable]', :immediately
   end
 end
 
@@ -43,7 +38,7 @@ package 'dirmngr' do
   only_if { node['platform_family'] == 'debian' && node['platform_version'].to_i >= 9 }
 end
 
-apt_repository 'docker-main' do
+apt_repository 'docker-stable' do
   uri 'https://download.docker.com/linux/debian'
   components %w(stable)
   distribution node['lsb']['codename']
@@ -117,7 +112,7 @@ node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unle
 
 magic_shell_environment 'DOCKER_HOST' do
   value node['osl-docker']['host']
-  only_if { node['osl-docker']['host'] }
+  not_if { node['osl-docker']['host'].nil? }
 end
 
 magic_shell_environment 'DOCKER_TLS_VERIFY' do
