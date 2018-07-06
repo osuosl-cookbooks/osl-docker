@@ -239,7 +239,7 @@ describe 'osl-docker::default' do
               components: %w(stable),
               distribution: 'jessie',
               keyserver: 'hkp://p80.pool.sks-keyservers.net:80',
-              key: '0EBFCD88'
+              key: %w(0EBFCD88)
             )
         end
         it do
