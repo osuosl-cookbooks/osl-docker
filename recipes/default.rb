@@ -26,6 +26,11 @@ if node['platform_family'] == 'rhel' && node['kernel']['machine'] != 's390x'
     end
   end
 
+  # Removes the old docker-main repo (replaced by docker-stable)
+  yum_repository 'docker-main' do
+    action :delete
+  end
+
   yum_version_lock node['osl-docker']['package']['package_name'] do
     version node['osl-docker']['package']['version']
     release node['osl-docker']['package_release']
@@ -40,12 +45,15 @@ end
 
 if node['platform_family'] == 'debian'
   include_recipe 'chef-apt-docker'
-end
 
-apt_preference node['osl-docker']['package']['package_name'] do
-  pin "version #{node['osl-docker']['package']['version']}*"
-  pin_priority '1001'
-  only_if { node['platform_family'] == 'debian' }
+  apt_repository 'docker-main' do
+    action :remove
+  end
+
+  apt_preference node['osl-docker']['package']['package_name'] do
+    pin "version #{node['osl-docker']['package']['version']}*"
+    pin_priority '1001'
+  end
 end
 
 docker_installation_tarball 'default' do

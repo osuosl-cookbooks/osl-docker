@@ -209,6 +209,9 @@ describe 'osl-docker::default' do
           end
         end
         it do
+          expect(chef_run).to delete_yum_repository('docker-main')
+        end
+        it do
           expect(chef_run).to add_yum_version_lock('docker-ce')
             .with(
               version: '17.09.0.ce',
@@ -237,6 +240,9 @@ describe 'osl-docker::default' do
         end
         it do
           expect(chef_run).to add_apt_repository('docker-stable')
+        end
+        it do
+          expect(chef_run).to remove_apt_repository('docker-main')
         end
         it do
           expect(chef_run).to add_apt_preference('docker-ce')
