@@ -38,13 +38,8 @@ package 'dirmngr' do
   only_if { node['platform_family'] == 'debian' && node['platform_version'].to_i >= 9 }
 end
 
-apt_repository 'docker-stable' do
-  uri 'https://download.docker.com/linux/debian'
-  components %w(stable)
-  distribution node['lsb']['codename']
-  keyserver 'hkp://p80.pool.sks-keyservers.net:80'
-  key '0EBFCD88'
-  only_if { node['platform_family'] == 'debian' }
+if node['platform_family'] == 'debian'
+  include_recipe 'chef-apt-docker'
 end
 
 apt_preference node['osl-docker']['package']['package_name'] do

@@ -233,14 +233,10 @@ describe 'osl-docker::default' do
           expect(chef_run).to create_docker_installation_package('default').with(version: '17.09.0')
         end
         it do
+          expect(chef_run).to include_recipe('chef-apt-docker')
+        end
+        it do
           expect(chef_run).to add_apt_repository('docker-stable')
-            .with(
-              uri: 'https://download.docker.com/linux/debian',
-              components: %w(stable),
-              distribution: 'jessie',
-              keyserver: 'hkp://p80.pool.sks-keyservers.net:80',
-              key: %w(0EBFCD88)
-            )
         end
         it do
           expect(chef_run).to add_apt_preference('docker-ce')
