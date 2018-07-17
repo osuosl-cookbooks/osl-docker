@@ -36,7 +36,7 @@ describe 'osl-docker::powerci' do
               '--protocol tcp --source 192.168.6.0/24 --destination-port 2375 --jump ACCEPT',
               '--protocol tcp --source 192.168.6.0/24 --destination-port 2376 --jump ACCEPT',
               '--protocol tcp --source 140.211.168.207/32 --destination-port 2375 --jump ACCEPT',
-              '--protocol tcp --source 140.211.168.207/32 --destination-port 2376 --jump ACCEPT'
+              '--protocol tcp --source 140.211.168.207/32 --destination-port 2376 --jump ACCEPT',
             ]
           )
       end
@@ -45,7 +45,7 @@ describe 'osl-docker::powerci' do
           .with(
             rule: [
               '--protocol tcp --source 192.168.6.0/24 --destination-port 32768:61000 --jump ACCEPT',
-              '--protocol tcp --source 140.211.168.207/32 --destination-port 32768:61000 --jump ACCEPT'
+              '--protocol tcp --source 140.211.168.207/32 --destination-port 32768:61000 --jump ACCEPT',
             ]
           )
       end
