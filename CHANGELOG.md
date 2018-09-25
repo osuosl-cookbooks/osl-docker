@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.1.0 (2018-09-25)
+------------------
+- Update to latest upstream docker cookbook
+
 2.0.0 (2018-07-17)
 ------------------
 - Chef 13 compatibility fixes
