@@ -38,12 +38,12 @@ if node['platform_family'] == 'rhel' && node['kernel']['machine'] != 's390x'
   end
 end
 
-# Needed on Debian 9 to import the GPG key
-package 'dirmngr' do
-  only_if { node['platform_family'] == 'debian' && node['platform_version'].to_i >= 9 }
-end
-
 if node['platform_family'] == 'debian'
+  # Needed on Debian 9 to import the GPG key
+  package 'dirmngr' do
+    only_if { node['platform_version'].to_i >= 9 }
+  end
+
   include_recipe 'chef-apt-docker'
 
   apt_repository 'docker-main' do
