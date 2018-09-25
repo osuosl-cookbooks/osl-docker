@@ -236,6 +236,38 @@ describe 'osl-docker::default' do
           expect(chef_run).to create_docker_installation_package('default').with(version: '17.09.0')
         end
         it do
+          expect(chef_run).to_not install_package('dirmngr')
+        end
+        it do
+          expect(chef_run).to include_recipe('chef-apt-docker')
+        end
+        it do
+          expect(chef_run).to add_apt_repository('docker-stable')
+        end
+        it do
+          expect(chef_run).to remove_apt_repository('docker-main')
+        end
+        it do
+          expect(chef_run).to add_apt_preference('docker-ce')
+            .with(
+              pin: 'version 17.09.0*',
+              pin_priority: '1001'
+            )
+        end
+        it do
+          expect(chef_run).to_not include_recipe('chef-yum-docker')
+        end
+        it do
+          expect(chef_run).to_not add_yum_version_lock('docker-engine')
+        end
+      when DEBIAN_9
+        it do
+          expect(chef_run).to create_docker_installation_package('default').with(version: '17.09.0')
+        end
+        it do
+          expect(chef_run).to install_package('dirmngr')
+        end
+        it do
           expect(chef_run).to include_recipe('chef-apt-docker')
         end
         it do
