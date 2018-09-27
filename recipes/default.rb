@@ -15,16 +15,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-if node['platform_family'] == 'rhel' && node['kernel']['machine'] != 's390x'
+if node['platform_family'] == 'rhel' && node['kernel']['machine'] == 'x86_64'
   include_recipe 'chef-yum-docker'
   include_recipe 'yum-plugin-versionlock'
-
-  if node['kernel']['machine'] == 'ppc64le'
-    edit_resource(:yum_repository, 'docker-stable') do
-      baseurl 'http://ftp.unicamp.br/pub/ppc64el/rhel/7/docker-ppc64el/'
-      gpgcheck false
-    end
-  end
 
   # Removes the old docker-main repo (replaced by docker-stable)
   yum_repository 'docker-main' do
@@ -56,25 +49,29 @@ if node['platform_family'] == 'debian'
   end
 end
 
+docker_installation_package 'default' do
+  node['osl-docker']['package'].each do |key, value|
+    send(key.to_sym, value)
+  end
+  if %w(ppc64le s390x).include?(node['kernel']['machine'])
+    action :delete
+  else
+    action :create
+    notifies :restart, 'docker_service[default]'
+  end
+end
+
 docker_installation_tarball 'default' do
   node['osl-docker']['tarball'].each do |key, value|
     send(key.to_sym, value)
   end
-  only_if { node['kernel']['machine'] == 's390x' }
+  only_if { %w(ppc64le s390x).include?(node['kernel']['machine']) }
   notifies :restart, 'docker_service[default]'
 end
 
 group 'docker' do
   system true
-  only_if { node['kernel']['machine'] == 's390x' }
-end
-
-docker_installation_package 'default' do
-  node['osl-docker']['package'].each do |key, value|
-    send(key.to_sym, value)
-  end
-  not_if { node['kernel']['machine'] == 's390x' }
-  notifies :restart, 'docker_service[default]'
+  only_if { %w(ppc64le s390x).include?(node['kernel']['machine']) }
 end
 
 directory '/etc/docker/ssl' do
