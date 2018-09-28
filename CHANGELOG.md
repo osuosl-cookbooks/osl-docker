@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.2.1 (2018-09-28)
+------------------
+- Tell docker_service not to try an install_method
+
 2.2.0 (2018-09-27)
 ------------------
 - Update to docker-18.06.1
