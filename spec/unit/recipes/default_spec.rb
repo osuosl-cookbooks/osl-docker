@@ -10,7 +10,7 @@ describe 'osl-docker::default' do
         expect { chef_run }.to_not raise_error
       end
       it do
-        expect(chef_run).to create_docker_service('default')
+        expect(chef_run).to create_docker_service('default').with(install_method: 'none')
       end
       it do
         expect(chef_run).to start_docker_service('default')
@@ -139,6 +139,7 @@ describe 'osl-docker::default' do
         it do
           expect(chef_run).to create_docker_service('default')
             .with(
+              install_method: 'none',
               tls_verify: true,
               tls_ca_cert: '/etc/docker/ssl/ca.pem',
               tls_server_cert: '/etc/docker/ssl/server.pem',
