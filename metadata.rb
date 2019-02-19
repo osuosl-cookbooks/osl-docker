@@ -11,7 +11,7 @@ version          '2.2.1'
 
 depends          'apt', '< 7.0.0'
 depends          'certificate'
-depends          'docker', '~> 4.6.5'
+depends          'docker', '~> 4.9.2'
 depends          'firewall', '>= 4.4.4'
 depends          'systemd', '< 3.0.0'
 depends          'magic_shell'
