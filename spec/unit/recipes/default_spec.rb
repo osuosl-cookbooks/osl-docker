@@ -152,7 +152,7 @@ describe 'osl-docker::default' do
       case p
       when CENTOS_7
         it do
-          expect(chef_run).to create_docker_installation_package('default').with(version: '18.06.1.ce')
+          expect(chef_run).to create_docker_installation_package('default').with(version: '18.06.2.ce')
         end
         context 'ppc64le' do
           cached(:chef_run) do
@@ -177,9 +177,9 @@ describe 'osl-docker::default' do
           it do
             expect(chef_run).to create_docker_installation_tarball('default')
               .with(
-                version: '18.06.1',
-                checksum: '479083ac0b2bae839782ea53870809b8590f440db5f0bdf1294eac95e1a2ec3b',
-                source: 'https://download.docker.com/linux/static/stable/ppc64le/docker-18.06.1-ce.tgz'
+                version: '18.06.2',
+                checksum: '9be128dc0da806dca4212da66cb7691f24771a5fd357b30336e4b858263432b3',
+                source: 'https://download.docker.com/linux/static/stable/ppc64le/docker-18.06.2-ce.tgz'
               )
           end
           it do
@@ -209,9 +209,9 @@ describe 'osl-docker::default' do
           it do
             expect(chef_run).to create_docker_installation_tarball('default')
               .with(
-                version: '18.06.1',
-                checksum: '4042fc5a00baf9ceb3724b8f1a285bbdda714b0360b4a406fd316ecc6142dee3',
-                source: 'https://download.docker.com/linux/static/stable/s390x/docker-18.06.1-ce.tgz'
+                version: '18.06.2',
+                checksum: 'a061c590785bec5010273eb7592968a65046bb21063e2a387cd8b74d13c6d275',
+                source: 'https://download.docker.com/linux/static/stable/s390x/docker-18.06.2-ce.tgz'
               )
           end
           it do
@@ -236,7 +236,7 @@ describe 'osl-docker::default' do
         it do
           expect(chef_run).to add_yum_version_lock('docker-ce')
             .with(
-              version: '18.06.1.ce',
+              version: '18.06.2.ce',
               release: '3.el7'
             )
         end
@@ -255,7 +255,7 @@ describe 'osl-docker::default' do
         end
       when DEBIAN_8
         it do
-          expect(chef_run).to create_docker_installation_package('default').with(version: '18.06.1')
+          expect(chef_run).to create_docker_installation_package('default').with(version: '18.06.2')
         end
         it do
           expect(chef_run).to_not install_package('dirmngr')
@@ -272,7 +272,7 @@ describe 'osl-docker::default' do
         it do
           expect(chef_run).to add_apt_preference('docker-ce')
             .with(
-              pin: 'version 18.06.1*',
+              pin: 'version 18.06.2*',
               pin_priority: '1001'
             )
         end
@@ -284,7 +284,7 @@ describe 'osl-docker::default' do
         end
       when DEBIAN_9
         it do
-          expect(chef_run).to create_docker_installation_package('default').with(version: '18.06.1')
+          expect(chef_run).to create_docker_installation_package('default').with(version: '18.06.2')
         end
         it do
           expect(chef_run).to install_package('dirmngr')
@@ -301,7 +301,7 @@ describe 'osl-docker::default' do
         it do
           expect(chef_run).to add_apt_preference('docker-ce')
             .with(
-              pin: 'version 18.06.1*',
+              pin: 'version 18.06.2*',
               pin_priority: '1001'
             )
         end

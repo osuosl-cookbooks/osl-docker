@@ -8,7 +8,7 @@ shared_examples_for 'docker' do |docker_env|
   end
 
   describe command('docker --version') do
-    its(:stdout) { should match(/18\.06\.1-ce/) }
+    its(:stdout) { should match(/18\.06\.2-ce/) }
   end
 
   describe command("#{docker_env} docker ps") do
