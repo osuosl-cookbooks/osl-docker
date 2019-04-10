@@ -26,6 +26,13 @@ suites:
   - name: compose
     run_list:
       - recipe[osl-docker::compose]
+  - name: nvidia
+    verifier: inspec
+    run_list:
+      - recipe[osl-docker::nvidia]
+    excludes:
+      - debian-8
+      - debian-9
   - name: powerci
     run_list:
       - recipe[osl-docker::powerci]

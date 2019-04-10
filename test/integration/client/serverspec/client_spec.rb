@@ -1,5 +1,9 @@
 require 'spec_helper'
 
+describe file('/etc/docker/daemon.json') do
+  its(:content) { should match(/{\n}/) }
+end
+
 describe service('docker') do
   it { should_not be_enabled }
   it { should_not be_running }
