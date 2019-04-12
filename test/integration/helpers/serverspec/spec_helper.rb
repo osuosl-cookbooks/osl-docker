@@ -7,8 +7,14 @@ shared_examples_for 'docker' do |docker_env|
     it { should be_running }
   end
 
-  describe command('docker --version') do
-    its(:stdout) { should match(/18\.06\.2-ce/) }
+  %w(docker dockerd).each do |cmd|
+    describe command("#{cmd} --version") do
+      if os[:family] == 'debian' && os[:release].to_i == 8
+        its(:stdout) { should match(/18\.06\.3/) }
+      else
+        its(:stdout) { should match(/18\.09\.2/) }
+      end
+    end
   end
 
   describe command("#{docker_env} docker ps") do

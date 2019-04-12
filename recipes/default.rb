@@ -15,19 +15,41 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-if node['platform_family'] == 'rhel' && node['kernel']['machine'] == 'x86_64'
-  include_recipe 'chef-yum-docker'
+if node['platform_family'] == 'rhel'
   include_recipe 'yum-plugin-versionlock'
 
-  # Removes the old docker-main repo (replaced by docker-stable)
-  yum_repository 'docker-main' do
-    action :delete
+  # Remove repos which were created by chef-yum-docker cookbook that we no longer use
+  %w(
+    docker-main
+    docker-stable
+    docker-edge
+    docker-test
+  ).each do |r|
+    yum_repository r do
+      action :delete
+    end
+  end
+
+  yum_version_lock node['osl-docker']['package_cli_name'] do
+    version node['osl-docker']['package']['version']
+    release node['osl-docker']['package_release']
+    epoch 1
   end
 
   yum_version_lock node['osl-docker']['package']['package_name'] do
     version node['osl-docker']['package']['version']
     release node['osl-docker']['package_release']
-    notifies :makecache, 'yum_repository[docker-stable]', :immediately
+    epoch 3
+  end
+
+  # Use our docker repo for ppc64le & s390x
+  yum_repository 'Docker' do
+    baseurl 'https://ftp.osuosl.org/pub/osl/repos/yum/$releasever/docker-stable/$basearch'
+    gpgkey 'https://ftp.osuosl.org/pub/osl/repos/yum/RPM-GPG-KEY-osuosl'
+    description 'Docker Stable repository'
+    gpgcheck true
+    enabled true
+    only_if { %w(ppc64le s390x).include?(node['kernel']['machine']) }
   end
 end
 
@@ -37,15 +59,26 @@ if node['platform_family'] == 'debian'
     only_if { node['platform_version'].to_i >= 9 }
   end
 
-  include_recipe 'chef-apt-docker'
-
-  apt_repository 'docker-main' do
-    action :remove
+  # Remove repos which were created by chef-apt-docker cookbook that we no longer use
+  %w(
+    docker-main
+    docker-stable
+    docker-edge
+    docker-test
+  ).each do |r|
+    apt_repository r do
+      action :remove
+    end
   end
 
-  apt_preference node['osl-docker']['package']['package_name'] do
-    pin "version #{node['osl-docker']['package']['version']}*"
-    pin_priority '1001'
+  [
+    node['osl-docker']['package']['package_name'],
+    node['osl-docker']['package_cli_name'],
+  ].each do |p|
+    apt_preference p do
+      pin "version #{node['osl-docker']['package']['version']}*"
+      pin_priority '1001'
+    end
   end
 end
 
@@ -53,25 +86,8 @@ docker_installation_package 'default' do
   node['osl-docker']['package'].each do |key, value|
     send(key.to_sym, value)
   end
-  if %w(ppc64le s390x).include?(node['kernel']['machine'])
-    action :delete
-  else
-    action :create
-    notifies :restart, 'docker_service[default]'
-  end
-end
-
-docker_installation_tarball 'default' do
-  node['osl-docker']['tarball'].each do |key, value|
-    send(key.to_sym, value)
-  end
-  only_if { %w(ppc64le s390x).include?(node['kernel']['machine']) }
+  action :create
   notifies :restart, 'docker_service[default]'
-end
-
-group 'docker' do
-  system true
-  only_if { %w(ppc64le s390x).include?(node['kernel']['machine']) }
 end
 
 directory '/etc/docker/ssl' do
