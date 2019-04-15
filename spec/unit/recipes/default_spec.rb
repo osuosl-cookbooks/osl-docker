@@ -19,12 +19,6 @@ describe 'osl-docker::default' do
         expect(chef_run).to_not add_magic_shell_environment('DOCKER_HOST')
       end
       it do
-        expect(chef_run).to_not create_group('docker')
-      end
-      it do
-        expect(chef_run).to_not create_docker_installation_tarball('default')
-      end
-      it do
         expect(chef_run).to_not create_directory('/etc/docker/ssl')
       end
       it do
@@ -152,7 +146,7 @@ describe 'osl-docker::default' do
       case p
       when CENTOS_7
         it do
-          expect(chef_run).to create_docker_installation_package('default').with(version: '18.06.2.ce')
+          expect(chef_run).to create_docker_installation_package('default').with(version: '18.09.2')
         end
         context 'ppc64le' do
           cached(:chef_run) do
@@ -161,29 +155,14 @@ describe 'osl-docker::default' do
             end.converge(described_recipe)
           end
           it do
-            expect(chef_run).to_not create_yum_repository('docker-stable')
-          end
-          %w(yum-docker yum-plugin-versionlock).each do |r|
-            it do
-              expect(chef_run).to_not include_recipe(r)
-            end
-          end
-          it do
-            expect(chef_run).to_not add_yum_version_lock('docker-ce')
-          end
-          it do
-            expect(chef_run).to delete_docker_installation_package('default')
-          end
-          it do
-            expect(chef_run).to create_docker_installation_tarball('default')
+            expect(chef_run).to create_yum_repository('Docker')
               .with(
-                version: '18.06.2',
-                checksum: '9be128dc0da806dca4212da66cb7691f24771a5fd357b30336e4b858263432b3',
-                source: 'https://download.docker.com/linux/static/stable/ppc64le/docker-18.06.2-ce.tgz'
+                baseurl: 'https://ftp.osuosl.org/pub/osl/repos/yum/$releasever/docker-stable/$basearch',
+                gpgkey: 'https://ftp.osuosl.org/pub/osl/repos/yum/RPM-GPG-KEY-osuosl',
+                description: 'Docker Stable repository',
+                gpgcheck: true,
+                enabled: true
               )
-          end
-          it do
-            expect(chef_run).to create_group('docker').with(system: true)
           end
         end
         context 's390x' do
@@ -193,123 +172,113 @@ describe 'osl-docker::default' do
             end.converge(described_recipe)
           end
           it do
-            expect(chef_run).to_not create_yum_repository('docker-stable')
-          end
-          %w(yum-docker yum-plugin-versionlock).each do |r|
-            it do
-              expect(chef_run).to_not include_recipe(r)
-            end
-          end
-          it do
-            expect(chef_run).to_not add_yum_version_lock('docker-ce')
-          end
-          it do
-            expect(chef_run).to delete_docker_installation_package('default')
-          end
-          it do
-            expect(chef_run).to create_docker_installation_tarball('default')
+            expect(chef_run).to create_yum_repository('Docker')
               .with(
-                version: '18.06.2',
-                checksum: 'a061c590785bec5010273eb7592968a65046bb21063e2a387cd8b74d13c6d275',
-                source: 'https://download.docker.com/linux/static/stable/s390x/docker-18.06.2-ce.tgz'
+                baseurl: 'https://ftp.osuosl.org/pub/osl/repos/yum/$releasever/docker-stable/$basearch',
+                gpgkey: 'https://ftp.osuosl.org/pub/osl/repos/yum/RPM-GPG-KEY-osuosl',
+                description: 'Docker Stable repository',
+                gpgcheck: true,
+                enabled: true
               )
           end
-          it do
-            expect(chef_run).to create_group('docker').with(system: true)
-          end
         end
         it do
-          expect(chef_run).to create_yum_repository('docker-stable')
-            .with(
-              baseurl: 'https://download.docker.com/linux/centos/7/x86_64/stable',
-              gpgkey: 'https://download.docker.com/linux/centos/gpg'
-            )
+          expect(chef_run).to include_recipe('yum-plugin-versionlock')
         end
-        %w(chef-yum-docker yum-plugin-versionlock).each do |r|
+        %w(
+          docker-main
+          docker-stable
+          docker-edge
+          docker-test
+        ).each do |r|
           it do
-            expect(chef_run).to include_recipe(r)
+            expect(chef_run).to delete_yum_repository(r)
           end
-        end
-        it do
-          expect(chef_run).to delete_yum_repository('docker-main')
         end
         it do
           expect(chef_run).to add_yum_version_lock('docker-ce')
             .with(
-              version: '18.06.2.ce',
+              version: '18.09.2',
               release: '3.el7'
             )
         end
         it do
-          expect(chef_run.yum_version_lock('docker-ce')).to \
-            notify('yum_repository[docker-stable]').to(:makecache).immediately
-        end
-        it do
-          expect(chef_run).to_not add_apt_repository('docker-stable')
-        end
-        it do
-          expect(chef_run).to_not add_apt_preference('docker-ce')
+          expect(chef_run).to add_yum_version_lock('docker-ce-cli')
+            .with(
+              version: '18.09.2',
+              release: '3.el7'
+            )
         end
         it do
           expect(chef_run).to_not install_package('dirmgr')
         end
       when DEBIAN_8
         it do
-          expect(chef_run).to create_docker_installation_package('default').with(version: '18.06.2')
+          expect(chef_run).to create_docker_installation_package('default').with(version: '18.06.3')
         end
         it do
           expect(chef_run).to_not install_package('dirmngr')
         end
-        it do
-          expect(chef_run).to include_recipe('chef-apt-docker')
-        end
-        it do
-          expect(chef_run).to add_apt_repository('docker-stable')
-        end
-        it do
-          expect(chef_run).to remove_apt_repository('docker-main')
+        %w(
+          docker-main
+          docker-stable
+          docker-edge
+          docker-test
+        ).each do |r|
+          it do
+            expect(chef_run).to remove_apt_repository(r)
+          end
         end
         it do
           expect(chef_run).to add_apt_preference('docker-ce')
             .with(
-              pin: 'version 18.06.2*',
+              pin: 'version 18.06.3*',
               pin_priority: '1001'
             )
         end
         it do
-          expect(chef_run).to_not include_recipe('chef-yum-docker')
+          expect(chef_run).to add_apt_preference('docker-ce-cli')
+            .with(
+              pin: 'version 18.06.3*',
+              pin_priority: '1001'
+            )
         end
         it do
-          expect(chef_run).to_not add_yum_version_lock('docker-engine')
+          expect(chef_run).to_not add_yum_version_lock('docker-ce')
+        end
+        it do
+          expect(chef_run).to_not add_yum_version_lock('docker-ce-cli')
         end
       when DEBIAN_9
         it do
-          expect(chef_run).to create_docker_installation_package('default').with(version: '18.06.2')
+          expect(chef_run).to create_docker_installation_package('default').with(version: '5:18.09.2')
         end
         it do
           expect(chef_run).to install_package('dirmngr')
         end
-        it do
-          expect(chef_run).to include_recipe('chef-apt-docker')
-        end
-        it do
-          expect(chef_run).to add_apt_repository('docker-stable')
-        end
-        it do
-          expect(chef_run).to remove_apt_repository('docker-main')
+        %w(
+          docker-main
+          docker-stable
+          docker-edge
+          docker-test
+        ).each do |r|
+          it do
+            expect(chef_run).to remove_apt_repository(r)
+          end
         end
         it do
           expect(chef_run).to add_apt_preference('docker-ce')
             .with(
-              pin: 'version 18.06.2*',
+              pin: 'version 5:18.09.2*',
               pin_priority: '1001'
             )
         end
         it do
-          expect(chef_run).to_not include_recipe('chef-yum-docker')
-        end
-        it do
-          expect(chef_run).to_not add_yum_version_lock('docker-engine')
+          expect(chef_run).to add_apt_preference('docker-ce-cli')
+            .with(
+              pin: 'version 5:18.09.2*',
+              pin_priority: '1001'
+            )
         end
       end
     end
