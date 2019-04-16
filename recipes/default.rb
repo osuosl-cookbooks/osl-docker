@@ -87,7 +87,7 @@ docker_installation_package 'default' do
     send(key.to_sym, value)
   end
   action :create
-  notifies :restart, 'docker_service[default]'
+  notifies :restart, 'docker_service[default]' unless node['osl-docker']['client_only']
 end
 
 directory '/etc/docker/ssl' do
@@ -155,7 +155,13 @@ docker_service 'default' do
     tls_client_cert '/etc/docker/ssl/cert.pem'
     tls_client_key '/etc/docker/ssl/key.pem'
   end
+  not_if { node['osl-docker']['client_only'] }
   action [:create, :start]
+end
+
+service 'docker' do
+  action [:disable, :stop]
+  only_if { node['osl-docker']['client_only'] }
 end
 
 volume_filter = []
@@ -168,6 +174,7 @@ end
 cron 'docker_prune_volumes' do
   minute 15
   command "/usr/bin/docker system prune --volumes -f #{volume_filter.join(' ')} > /dev/null"
+  not_if { node['osl-docker']['client_only'] }
 end
 
 cron 'docker_prune_images' do
@@ -175,4 +182,5 @@ cron 'docker_prune_images' do
   hour 2
   weekday 0
   command "/usr/bin/docker system prune -a -f #{volume_filter.join(' ')} > /dev/null"
+  not_if { node['osl-docker']['client_only'] }
 end

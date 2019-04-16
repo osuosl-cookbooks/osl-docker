@@ -20,6 +20,9 @@ suites:
         tls: true
     driver_config:
       server_name: default_tls
+  - name: client
+    run_list:
+      - recipe[osl-docker::client]
   - name: compose
     run_list:
       - recipe[osl-docker::compose]
