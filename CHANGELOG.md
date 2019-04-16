@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.3.1 (2019-04-16)
+------------------
+- Add client recipe
+
 2.3.0 (2019-04-15)
 ------------------
 - Update to docker-18.09.2 and switch to using rpms for ppc64le/s390x
