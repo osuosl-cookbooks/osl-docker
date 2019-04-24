@@ -29,7 +29,3 @@ default['osl-docker']['tls'] = false
 default['osl-docker']['host'] = node['osl-docker']['tls'] ? 'tcp://127.0.0.1:2376' : nil
 default['osl-docker']['data_bag'] = 'docker'
 default['osl-docker']['client_only'] = false
-default['osl-docker']['nvidia']['driver_version'] = '410.104'
-default['osl-docker']['nvidia']['driver_release'] = '1.el7'
-default['osl-docker']['nvidia']['docker_version'] = '2.0.3'
-default['osl-docker']['nvidia']['docker_release'] = '1.docker18.09.2.ce'

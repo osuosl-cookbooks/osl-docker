@@ -32,28 +32,59 @@ include_recipe 'build-essential'
 include_recipe 'osl-docker'
 include_recipe 'yum-plugin-versionlock'
 
+version_lock = node['osl-docker']['nvidia']['version_lock']
+makecache_file = ::File.join(Chef::Config[:file_cache_path], 'makecache-cuda')
+
 %w(
   dkms-nvidia
   nvidia-driver
+  nvidia-driver-cuda
   nvidia-driver-cuda-libs
+  nvidia-driver-devel
   nvidia-driver-libs
+  nvidia-driver-NvFBCOpenGL
+  nvidia-driver-NVML
+  nvidia-libXNVCtrl
+  nvidia-libXNVCtrl-devel
+  nvidia-modprobe
+  nvidia-persistenced
+  nvidia-settings
+  nvidia-xconfig
 ).each do |p|
   yum_version_lock p do
-    version node['osl-docker']['nvidia']['driver_version']
-    release node['osl-docker']['nvidia']['driver_release']
+    version version_lock['nvidia-driver']['version']
+    release version_lock['nvidia-driver']['release']
     epoch 3
+    notifies :touch, "file[#{makecache_file}]", :immediately
   end
 end
 
+yum_version_lock 'cuda-drivers' do
+  version version_lock['cuda-drivers']['version']
+  release version_lock['cuda-drivers']['release']
+  notifies :touch, "file[#{makecache_file}]", :immediately
+end
+
 yum_version_lock 'nvidia-docker2' do
-  version node['osl-docker']['nvidia']['docker_version']
-  release node['osl-docker']['nvidia']['docker_release']
+  version version_lock['nvidia-docker2']['version']
+  release version_lock['nvidia-docker2']['release']
+  notifies :touch, "file[#{makecache_file}]", :immediately
 end
 
-package 'nvidia-driver' do
-  version "#{node['osl-docker']['nvidia']['driver_version']}-#{node['osl-docker']['nvidia']['driver_release']}"
+yum_version_lock 'cuda' do
+  version version_lock['cuda']['version']
+  release version_lock['cuda']['release']
+  notifies :touch, "file[#{makecache_file}]", :immediately
 end
 
-package 'nvidia-docker2' do
-  version "#{node['osl-docker']['nvidia']['docker_version']}-#{node['osl-docker']['nvidia']['docker_release']}"
+log 'yum makecache cuda' do
+  message 'yum makecache cuda'
+  only_if { ::File.exist?(makecache_file) }
+  notifies :makecache, 'yum_repository[cuda]', :immediately
 end
+
+file makecache_file do
+  action :delete
+end
+
+package %w(nvidia-driver cuda-drivers nvidia-docker2)
