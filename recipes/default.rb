@@ -90,6 +90,15 @@ docker_installation_package 'default' do
   notifies :restart, 'docker_service[default]' unless node['osl-docker']['client_only']
 end
 
+directory '/etc/docker'
+
+template '/etc/docker/daemon.json' do
+  variables(
+    config: node['osl-docker']['daemon']
+  )
+  notifies :restart, 'docker_service[default]' unless node['osl-docker']['client_only']
+end
+
 directory '/etc/docker/ssl' do
   owner 'root'
   group 'docker'

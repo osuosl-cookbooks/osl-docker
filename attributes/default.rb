@@ -23,6 +23,7 @@ when 'ppc64le', 's390x'
   default['osl-docker']['package']['setup_docker_repo'] = false
 end
 default['osl-docker']['service'] = {}
+default['osl-docker']['daemon'] = {}
 default['osl-docker']['prune']['volume_filter'] = []
 default['osl-docker']['tls'] = false
 default['osl-docker']['host'] = node['osl-docker']['tls'] ? 'tcp://127.0.0.1:2376' : nil

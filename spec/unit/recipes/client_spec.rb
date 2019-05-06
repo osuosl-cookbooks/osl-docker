@@ -16,6 +16,23 @@ describe 'osl-docker::client' do
         expect(chef_run).to_not add_magic_shell_environment('DOCKER_HOST')
       end
       it do
+        expect(chef_run).to create_directory('/etc/docker')
+      end
+      it do
+        expect(chef_run).to create_template('/etc/docker/daemon.json')
+          .with(
+            variables: {
+              config: {},
+            }
+          )
+      end
+      it do
+        expect(chef_run).to render_file('/etc/docker/daemon.json').with_content("{\n}")
+      end
+      it do
+        expect(chef_run.template('/etc/docker/daemon.json')).to_not notify('docker_service[default]').to(:restart)
+      end
+      it do
         expect(chef_run).to_not create_directory('/etc/docker/ssl')
       end
       it do

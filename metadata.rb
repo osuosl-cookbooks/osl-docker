@@ -10,10 +10,13 @@ long_description 'Installs/Configures osl-docker'
 version          '2.3.1'
 
 depends          'apt'
+depends          'build-essential'
 depends          'certificate'
 depends          'docker', '~> 4.9.2'
 depends          'firewall', '>= 4.4.4'
 depends          'magic_shell'
+depends          'yum-epel'
+depends          'yum-nvidia'
 depends          'yum-plugin-versionlock'
 
 supports         'centos', '~> 7.0'

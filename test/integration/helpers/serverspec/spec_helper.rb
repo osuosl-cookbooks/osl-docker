@@ -2,6 +2,10 @@ require 'serverspec'
 set :backend, :exec
 
 shared_examples_for 'docker' do |docker_env|
+  describe file('/etc/docker') do
+    it { should be_directory }
+  end
+
   describe service('docker') do
     it { should be_enabled }
     it { should be_running }
