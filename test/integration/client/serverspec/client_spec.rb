@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe file('/etc/docker/daemon.json') do
-  its(:content) { should match(/{\n}/) }
+  it { should_not exist }
 end
 
 describe service('docker') do
