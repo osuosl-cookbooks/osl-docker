@@ -17,12 +17,10 @@
 # limitations under the License.
 return unless node['platform_family'] == 'rhel'
 
-node.default['osl-docker']['daemon'] = {
-  runtimes: {
-    nvidia: {
-      path: 'nvidia-container-runtime',
-      runtimeArgs: [],
-    },
+node.default['osl-docker']['daemon']['runtimes'] = {
+  nvidia: {
+    path: 'nvidia-container-runtime',
+    runtimeArgs: [],
   },
 }
 
