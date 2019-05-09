@@ -25,12 +25,19 @@ describe 'osl-docker::default' do
         expect(chef_run).to create_template('/etc/docker/daemon.json')
           .with(
             variables: {
-              config: {},
+              config: {
+                'metrics-addr' => '0.0.0.0:9323',
+                'experimental' => true,
+              },
             }
           )
       end
       it do
-        expect(chef_run).to render_file('/etc/docker/daemon.json').with_content("{\n}")
+        expect(chef_run).to render_file('/etc/docker/daemon.json')
+          .with_content('{
+  "metrics-addr": "0.0.0.0:9323",
+  "experimental": true
+}')
       end
       it do
         expect(chef_run.template('/etc/docker/daemon.json')).to notify('docker_service[default]').to(:restart)

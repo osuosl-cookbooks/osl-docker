@@ -96,7 +96,8 @@ template '/etc/docker/daemon.json' do
   variables(
     config: node['osl-docker']['daemon']
   )
-  notifies :restart, 'docker_service[default]' unless node['osl-docker']['client_only']
+  not_if { node['osl-docker']['client_only'] }
+  notifies :restart, 'docker_service[default]'
 end
 
 directory '/etc/docker/ssl' do

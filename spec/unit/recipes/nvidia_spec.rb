@@ -106,6 +106,8 @@ describe 'osl-docker::nvidia' do
             .with(
               variables: {
                 config: {
+                  'metrics-addr' => '0.0.0.0:9323',
+                  'experimental' => true,
                   'runtimes' => {
                     'nvidia' => {
                       'path' => 'nvidia-container-runtime',
