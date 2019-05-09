@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.4.1 (2019-05-09)
+------------------
+- Enable builtin prometheus metrics in docker
+
 2.4.0 (2019-05-06)
 ------------------
 - Add support for nvidia-docker
