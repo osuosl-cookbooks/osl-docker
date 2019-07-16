@@ -9,14 +9,8 @@ when 'rhel'
 when 'debian'
   default['osl-docker']['package']['package_name'] = 'docker-ce'
   default['osl-docker']['package_cli_name'] = 'docker-ce-cli'
-  case node['platform_version'].to_i
-  when 8
-    # Debian 8 has no builds for 18.09.2 :(
-    default['osl-docker']['package']['version'] = '18.06.3'
-  else
-    default['osl-docker']['package']['version'] = '5:18.09.2'
-    default['osl-docker']['package']['package_version'] = '5:18.09.2~3-0~debian-stretch'
-  end
+  default['osl-docker']['package']['version'] = '5:18.09.2'
+  default['osl-docker']['package']['package_version'] = '5:18.09.2~3-0~debian-stretch'
 end
 case node['kernel']['machine']
 when 'ppc64le', 's390x'

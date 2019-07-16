@@ -236,43 +236,6 @@ describe 'osl-docker::default' do
         it do
           expect(chef_run).to_not install_package('dirmgr')
         end
-      when DEBIAN_8
-        it do
-          expect(chef_run).to create_docker_installation_package('default').with(version: '18.06.3')
-        end
-        it do
-          expect(chef_run).to_not install_package('dirmngr')
-        end
-        %w(
-          docker-main
-          docker-stable
-          docker-edge
-          docker-test
-        ).each do |r|
-          it do
-            expect(chef_run).to remove_apt_repository(r)
-          end
-        end
-        it do
-          expect(chef_run).to add_apt_preference('docker-ce')
-            .with(
-              pin: 'version 18.06.3*',
-              pin_priority: '1001'
-            )
-        end
-        it do
-          expect(chef_run).to add_apt_preference('docker-ce-cli')
-            .with(
-              pin: 'version 18.06.3*',
-              pin_priority: '1001'
-            )
-        end
-        it do
-          expect(chef_run).to_not add_yum_version_lock('docker-ce')
-        end
-        it do
-          expect(chef_run).to_not add_yum_version_lock('docker-ce-cli')
-        end
       when DEBIAN_9
         it do
           expect(chef_run).to create_docker_installation_package('default').with(version: '5:18.09.2')
