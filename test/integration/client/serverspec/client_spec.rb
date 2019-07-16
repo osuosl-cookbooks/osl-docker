@@ -11,7 +11,7 @@ end
 
 %w(docker dockerd).each do |cmd|
   describe command("#{cmd} --version") do
-      its(:stdout) { should match(/18\.09\.2/) }
+    its(:stdout) { should match(/18\.09\.2/) }
   end
 end
 
