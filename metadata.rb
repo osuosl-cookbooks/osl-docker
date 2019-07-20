@@ -20,5 +20,4 @@ depends          'yum-nvidia'
 depends          'yum-plugin-versionlock'
 
 supports         'centos', '~> 7.0'
-supports         'debian', '~> 8.0'
 supports         'debian', '~> 9.0'

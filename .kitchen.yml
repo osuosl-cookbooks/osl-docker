@@ -31,13 +31,11 @@ suites:
     run_list:
       - recipe[osl-docker::nvidia]
     excludes:
-      - debian-8
       - debian-9
   - name: powerci
     run_list:
       - recipe[osl-docker::powerci]
     excludes:
-      - debian-8
       - debian-9
   - name: ibmz_ci
     run_list:
@@ -45,7 +43,6 @@ suites:
     driver_config:
       server_name: ibmz_ci
     excludes:
-      - debian-8
       - debian-9
   - name: workstation
     run_list:

@@ -54,10 +54,7 @@ if node['platform_family'] == 'rhel'
 end
 
 if node['platform_family'] == 'debian'
-  # Needed on Debian 9 to import the GPG key
-  package 'dirmngr' do
-    only_if { node['platform_version'].to_i >= 9 }
-  end
+  package 'dirmngr'
 
   # Remove repos which were created by chef-apt-docker cookbook that we no longer use
   %w(
