@@ -39,6 +39,12 @@ makecache_file = ::File.join(Chef::Config[:file_cache_path], 'makecache-cuda')
   nvidia-driver-cuda
   nvidia-driver-cuda-libs
   nvidia-driver-devel
+  nvidia-driver-latest-dkms
+  nvidia-driver-latest-dkms-cuda
+  nvidia-driver-latest-dkms-cuda-libs
+  nvidia-driver-latest-dkms-devel
+  nvidia-driver-latest-dkms-NvFBCOpenGL
+  nvidia-driver-latest-dkms-NVML
   nvidia-driver-libs
   nvidia-driver-NvFBCOpenGL
   nvidia-driver-NVML
@@ -85,4 +91,4 @@ file makecache_file do
   action :delete
 end
 
-package %w(nvidia-driver cuda-drivers nvidia-docker2)
+package %w(nvidia-driver-latest-dkms cuda-drivers nvidia-docker2)

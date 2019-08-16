@@ -33,6 +33,12 @@ describe 'osl-docker::nvidia' do
           nvidia-driver-cuda
           nvidia-driver-cuda-libs
           nvidia-driver-devel
+          nvidia-driver-latest-dkms
+          nvidia-driver-latest-dkms-cuda
+          nvidia-driver-latest-dkms-cuda-libs
+          nvidia-driver-latest-dkms-devel
+          nvidia-driver-latest-dkms-NvFBCOpenGL
+          nvidia-driver-latest-dkms-NVML
           nvidia-driver-libs
           nvidia-driver-NvFBCOpenGL
           nvidia-driver-NVML
@@ -46,7 +52,7 @@ describe 'osl-docker::nvidia' do
           it do
             expect(chef_run).to add_yum_version_lock(pkg)
               .with(
-                version: '410.104',
+                version: '418.87.00',
                 release: '1.el7',
                 epoch: 3
               )
@@ -98,7 +104,7 @@ describe 'osl-docker::nvidia' do
         end
 
         it do
-          expect(chef_run).to install_package(%w(nvidia-driver cuda-drivers nvidia-docker2))
+          expect(chef_run).to install_package(%w(nvidia-driver-latest-dkms cuda-drivers nvidia-docker2))
         end
 
         it do
@@ -156,6 +162,12 @@ describe 'osl-docker::nvidia' do
           nvidia-driver-cuda
           nvidia-driver-cuda-libs
           nvidia-driver-devel
+          nvidia-driver-latest-dkms
+          nvidia-driver-latest-dkms-cuda
+          nvidia-driver-latest-dkms-cuda-libs
+          nvidia-driver-latest-dkms-devel
+          nvidia-driver-latest-dkms-NvFBCOpenGL
+          nvidia-driver-latest-dkms-NVML
           nvidia-driver-libs
           nvidia-driver-NvFBCOpenGL
           nvidia-driver-NVML
@@ -172,7 +184,7 @@ describe 'osl-docker::nvidia' do
         end
 
         it do
-          expect(chef_run).to_not install_package(%w(nvidia-driver cuda-drivers nvidia-docker2))
+          expect(chef_run).to_not install_package(%w(nvidia-driver-latest-dkms cuda-drivers nvidia-docker2))
         end
       end
     end
