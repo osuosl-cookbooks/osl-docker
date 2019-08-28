@@ -18,7 +18,6 @@ describe 'osl-docker::nvidia' do
         %w(
           yum-epel
           yum-nvidia
-          build-essential
           osl-docker
           yum-plugin-versionlock
         ).each do |r|
