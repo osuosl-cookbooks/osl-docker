@@ -30,7 +30,6 @@ build_essential 'nvidia'
 include_recipe 'osl-docker'
 include_recipe 'yum-plugin-versionlock'
 
-
 version_lock = node['osl-docker']['nvidia']['version_lock']
 makecache_file = ::File.join(Chef::Config[:file_cache_path], 'makecache-cuda')
 
