@@ -1,8 +1,6 @@
 require 'chefspec'
 require 'chefspec/berkshelf'
 
-ChefSpec::Coverage.start! { add_filter 'osl-docker' }
-
 CENTOS_7 = {
   platform: 'centos',
   version: '7',
@@ -29,5 +27,5 @@ DEBIAN_PLATFORMS = [
 ].freeze
 
 RSpec.configure do |config|
-  config.log_level = :fatal
+  config.log_level = :warn
 end

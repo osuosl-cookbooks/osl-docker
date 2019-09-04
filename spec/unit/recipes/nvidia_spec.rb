@@ -15,6 +15,9 @@ describe 'osl-docker::nvidia' do
       end
       case p
       when CENTOS_7
+        it do
+          expect(chef_run).to install_build_essential('nvidia')
+        end
         %w(
           yum-epel
           yum-nvidia
