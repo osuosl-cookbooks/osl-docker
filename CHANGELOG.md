@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.6.0 (2019-09-05)
+------------------
+- Chef 14 compatability fixes
+
 2.5.1 (2019-08-16)
 ------------------
 - Update nvidia-driver to 418.87.00 and fix package name
