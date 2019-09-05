@@ -26,7 +26,9 @@ node.default['osl-docker']['daemon']['runtimes'] = {
 
 include_recipe 'yum-epel'
 include_recipe 'yum-nvidia'
-include_recipe 'build-essential'
+
+build_essential 'nvidia'
+
 include_recipe 'osl-docker'
 include_recipe 'yum-plugin-versionlock'
 

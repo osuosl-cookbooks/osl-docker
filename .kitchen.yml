@@ -10,6 +10,7 @@ provisioner:
 suites:
   - name: default
     run_list:
+      - recipe[docker_test]
       - recipe[osl-docker::default]
   - name: default_tls
     run_list:
