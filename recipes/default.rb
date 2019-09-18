@@ -79,6 +79,12 @@ if node['platform_family'] == 'debian'
   end
 end
 
+include_recipe 'firewall::prometheus'
+
+firewall_prometheus 'docker_exporter' do
+  port 9323
+end
+
 docker_installation_package 'default' do
   node['osl-docker']['package'].each do |key, value|
     send(key.to_sym, value)
