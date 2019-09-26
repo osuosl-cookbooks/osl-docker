@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.6.1 (2019-09-26)
+------------------
+- Add firewall_prometheus resource for docker_exporter
+
 2.6.0 (2019-09-05)
 ------------------
 - Chef 14 compatability fixes
