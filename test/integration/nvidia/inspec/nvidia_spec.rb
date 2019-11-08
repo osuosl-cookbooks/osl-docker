@@ -14,10 +14,10 @@ describe package('nvidia-docker2') do
   its('version') { should eq '2.0.3-1.docker18.09.2.ce' }
 end
 
-describe package('cuda-drivers') do
-  it { should be_installed }
-  its('version') { should eq '410.104-1' }
-end
+# describe package('cuda-drivers') do
+#   it { should be_installed }
+#   its('version') { should eq '410.104-1' }
+# end
 
 describe docker.info do
   its('Runtimes.nvidia.path') { should eq 'nvidia-container-runtime' }
