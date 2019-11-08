@@ -1,4 +1,4 @@
-def inspec_docker?(_docker_env = '')
+def inspec_docker?(docker_env = '')
   describe file('/etc/docker') do
     it { should be_directory }
   end
@@ -14,7 +14,7 @@ def inspec_docker?(_docker_env = '')
     end
   end
 
-  describe command('docker ps') do
+  describe command("#{docker_env} docker ps") do
     its('exit_status') { should eq 0 }
   end
 
