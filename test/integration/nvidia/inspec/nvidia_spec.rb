@@ -6,7 +6,7 @@
 # found at http://inspec.io/docs/reference/resources/
 describe package('nvidia-driver-latest-dkms') do
   it { should be_installed }
-  its('version') { should eq '418.87.00-1.el7' }
+  its('version') { should eq '418.87.01-1.el7' }
 end
 
 describe package('nvidia-docker2') do

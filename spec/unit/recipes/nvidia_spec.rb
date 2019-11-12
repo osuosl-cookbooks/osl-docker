@@ -54,7 +54,7 @@ describe 'osl-docker::nvidia' do
           it do
             expect(chef_run).to add_yum_version_lock(pkg)
               .with(
-                version: '418.87.00',
+                version: '418.87.01',
                 release: '1.el7',
                 epoch: 3
               )
