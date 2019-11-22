@@ -126,5 +126,4 @@ file makecache_file do
   action :delete
 end
 
-package 'nvidia-docker2'
-# package %w(nvidia-driver-latest-dkms cuda-drivers nvidia-docker2)
+package %w(nvidia-driver-latest-dkms cuda-drivers nvidia-docker2)

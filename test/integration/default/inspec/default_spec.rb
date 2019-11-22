@@ -2,13 +2,9 @@ require_relative '../../helpers/inspec/docker_helper.rb'
 
 inspec_docker?
 
-describe file('/etc/docker/daemon.json') do
-  its('content') do
-    should match(/{
-  "metrics-addr": "0.0.0.0:9323",
-  "experimental": true
-}/)
-  end
+describe json('/etc/docker/daemon.json') do
+  its('metrics-addr') { should cmp '0.0.0.0:9323' }
+  its('experimental') { should cmp 'true' }
 end
 
 describe crontab.where { command =~ /docker system prune --volumes/ } do
@@ -38,7 +34,7 @@ describe ip6tables do
   it { should have_rule('-A prometheus -s 2605:bc80:3010::/48 -p tcp -m tcp --dport 9323 -j ACCEPT') }
 end
 
-describe command('curl http://localhost:9323/metrics') do
-  its('stdout') { should match(/^engine_daemon_engine_info.*/) }
-  its('exit_status') { should eq 0 }
+describe http('http://localhost:9323/metrics') do
+  its('status') { should cmp 200 }
+  its('body') { should match(/^engine_daemon_engine_info.*/) }
 end
