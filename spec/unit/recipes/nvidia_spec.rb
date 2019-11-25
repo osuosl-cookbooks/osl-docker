@@ -31,25 +31,36 @@ describe 'osl-docker::nvidia' do
 
         %w(
           dkms-nvidia
+          kmod-nvidia-latest-dkms
           nvidia-driver
           nvidia-driver-cuda
           nvidia-driver-cuda-libs
           nvidia-driver-devel
+          nvidia-driver-latest
+          nvidia-driver-latest-cuda
           nvidia-driver-latest-dkms
           nvidia-driver-latest-dkms-cuda
           nvidia-driver-latest-dkms-cuda-libs
           nvidia-driver-latest-dkms-devel
+          nvidia-driver-latest-dkms-libs
           nvidia-driver-latest-dkms-NvFBCOpenGL
           nvidia-driver-latest-dkms-NVML
           nvidia-driver-libs
           nvidia-driver-NvFBCOpenGL
           nvidia-driver-NVML
+          nvidia-kmod
           nvidia-libXNVCtrl
           nvidia-libXNVCtrl-devel
           nvidia-modprobe
+          nvidia-modprobe-latest
+          nvidia-modprobe-latest-dkms
           nvidia-persistenced
+          nvidia-persistenced-latest
+          nvidia-persistenced-latest-dkms
           nvidia-settings
           nvidia-xconfig
+          nvidia-xconfig-latest
+          nvidia-xconfig-latest-dkms
         ).each do |pkg|
           it do
             expect(chef_run).to add_yum_version_lock(pkg)
@@ -86,6 +97,26 @@ describe 'osl-docker::nvidia' do
               version: '10.0.130',
               release: '1'
             )
+        end
+        %w(440).each do |ver|
+          [
+            "nvidia-driver-branch-#{ver}",
+            "nvidia-driver-branch-#{ver}-cuda",
+            "nvidia-driver-branch-#{ver}-cuda-libs",
+            "nvidia-driver-branch-#{ver}-devel",
+            "nvidia-driver-branch-#{ver}-NvFBCOpenGL",
+            "nvidia-driver-branch-#{ver}-NVML",
+            "nvidia-modprobe-branch-#{ver}",
+            "nvidia-persistenced-branch-#{ver}",
+            "nvidia-xconfig-branch-#{ver}",
+          ].each do |pkg|
+            it do
+              expect(chef_run).to add_yum_version_lock(pkg).with(version: '*', release: '*', epoch: 3)
+            end
+            it do
+              expect(chef_run.yum_version_lock(pkg)).to notify('file[/var/chef/cache/makecache-cuda]').to(:touch).immediately
+            end
+          end
         end
         %w(cuda-drivers nvidia-docker2 cuda).each do |pkg|
           it do
