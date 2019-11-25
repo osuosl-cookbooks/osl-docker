@@ -37,25 +37,36 @@ makecache_file = ::File.join(Chef::Config[:file_cache_path], 'makecache-cuda')
 
 %w(
   dkms-nvidia
+  kmod-nvidia-latest-dkms
   nvidia-driver
   nvidia-driver-cuda
   nvidia-driver-cuda-libs
   nvidia-driver-devel
+  nvidia-driver-latest
+  nvidia-driver-latest-cuda
   nvidia-driver-latest-dkms
   nvidia-driver-latest-dkms-cuda
   nvidia-driver-latest-dkms-cuda-libs
   nvidia-driver-latest-dkms-devel
+  nvidia-driver-latest-dkms-libs
   nvidia-driver-latest-dkms-NvFBCOpenGL
   nvidia-driver-latest-dkms-NVML
   nvidia-driver-libs
   nvidia-driver-NvFBCOpenGL
   nvidia-driver-NVML
+  nvidia-kmod
   nvidia-libXNVCtrl
   nvidia-libXNVCtrl-devel
   nvidia-modprobe
+  nvidia-modprobe-latest
+  nvidia-modprobe-latest-dkms
   nvidia-persistenced
+  nvidia-persistenced-latest
+  nvidia-persistenced-latest-dkms
   nvidia-settings
   nvidia-xconfig
+  nvidia-xconfig-latest
+  nvidia-xconfig-latest-dkms
 ).each do |p|
   yum_version_lock p do
     version version_lock['nvidia-driver']['version']
@@ -81,6 +92,28 @@ yum_version_lock 'cuda' do
   version version_lock['cuda']['version']
   release version_lock['cuda']['release']
   notifies :touch, "file[#{makecache_file}]", :immediately
+end
+
+# Exclude any versions that conflict with what we want
+%w(440).each do |ver|
+  [
+    "nvidia-driver-branch-#{ver}",
+    "nvidia-driver-branch-#{ver}-cuda",
+    "nvidia-driver-branch-#{ver}-cuda-libs",
+    "nvidia-driver-branch-#{ver}-devel",
+    "nvidia-driver-branch-#{ver}-NvFBCOpenGL",
+    "nvidia-driver-branch-#{ver}-NVML",
+    "nvidia-modprobe-branch-#{ver}",
+    "nvidia-persistenced-branch-#{ver}",
+    "nvidia-xconfig-branch-#{ver}",
+  ].each do |p|
+    yum_version_lock p do
+      version '*'
+      release '*'
+      epoch 3
+      notifies :touch, "file[#{makecache_file}]", :immediately
+    end
+  end
 end
 
 log 'yum makecache cuda' do
