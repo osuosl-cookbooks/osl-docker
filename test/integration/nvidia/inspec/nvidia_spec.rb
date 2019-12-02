@@ -4,6 +4,7 @@
 
 # The Inspec reference, with examples and extensive documentation, can be
 # found at http://inspec.io/docs/reference/resources/
+
 describe package('nvidia-driver-latest-dkms') do
   it { should be_installed }
   its('version') { should eq '418.87.01-1.el7' }
