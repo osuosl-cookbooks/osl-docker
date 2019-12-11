@@ -13,6 +13,8 @@ when 'debian'
   default['osl-docker']['package']['package_version'] = '5:18.09.2~3-0~debian-stretch'
 end
 case node['kernel']['machine']
+when 'x86_64'
+  default['osl-docker']['package']['setup_docker_repo'] = false if node['platform_version'].to_i >= 8
 when 'ppc64le', 's390x'
   default['osl-docker']['package']['setup_docker_repo'] = false
 end

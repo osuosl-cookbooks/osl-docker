@@ -174,7 +174,20 @@ describe 'osl-docker::default' do
         end
       end
       case p
-      when CENTOS_7
+      when CENTOS_7, CENTOS_8
+        if p == CENTOS_8
+          it do
+            expect(chef_run).to create_yum_repository('Docker')
+              .with(
+                baseurl: 'https://download.docker.com/linux/centos/7/x86_64/stable',
+                gpgkey: 'https://download.docker.com/linux/centos/gpg',
+                description: 'Docker Stable repository',
+                gpgcheck: true,
+                enabled: true,
+                options: { module_hotfixes: true }
+              )
+          end
+        end
         it do
           expect(chef_run).to create_docker_installation_package('default').with(version: '18.09.2')
         end
@@ -226,14 +239,14 @@ describe 'osl-docker::default' do
           end
         end
         it do
-          expect(chef_run).to add_yum_version_lock('docker-ce')
+          expect(chef_run).to update_yum_version_lock('docker-ce')
             .with(
               version: '18.09.2',
               release: '3.el7'
             )
         end
         it do
-          expect(chef_run).to add_yum_version_lock('docker-ce-cli')
+          expect(chef_run).to update_yum_version_lock('docker-ce-cli')
             .with(
               version: '18.09.2',
               release: '3.el7'
