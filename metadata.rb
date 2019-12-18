@@ -10,7 +10,6 @@ long_description 'Installs/Configures osl-docker'
 version          '2.6.3'
 
 depends          'apt'
-depends          'build-essential'
 depends          'certificate'
 depends          'docker', '~> 4.9.2'
 depends          'firewall', '>= 4.4.4'
