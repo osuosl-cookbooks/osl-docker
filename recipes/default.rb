@@ -34,12 +34,14 @@ if node['platform_family'] == 'rhel'
     version node['osl-docker']['package']['version']
     release node['osl-docker']['package_release']
     epoch 1
+    action :update
   end
 
   yum_version_lock node['osl-docker']['package']['package_name'] do
     version node['osl-docker']['package']['version']
     release node['osl-docker']['package_release']
     epoch 3
+    action :update
   end
 
   # Use our docker repo for ppc64le & s390x
@@ -50,6 +52,19 @@ if node['platform_family'] == 'rhel'
     gpgcheck true
     enabled true
     only_if { %w(ppc64le s390x).include?(node['kernel']['machine']) }
+  end
+
+  # TODO: Use CentOS 7 repo on CentOS 8 until upstream has created the repo
+  yum_repository 'Docker' do
+    baseurl 'https://download.docker.com/linux/centos/7/x86_64/stable'
+    gpgkey 'https://download.docker.com/linux/centos/gpg'
+    description 'Docker Stable repository'
+    gpgcheck true
+    enabled true
+    # Enable all rpms to workaround modularity issue:
+    # https://forums.docker.com/t/yum-repo-for-centos-8/81884/8
+    options(module_hotfixes: true)
+    only_if { node['platform_version'].to_i >= 8 && node['kernel']['machine'] == 'x86_64' }
   end
 end
 

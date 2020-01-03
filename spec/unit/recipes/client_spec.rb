@@ -101,14 +101,14 @@ describe 'osl-docker::client' do
           end
         end
         it do
-          expect(chef_run).to add_yum_version_lock('docker-ce')
+          expect(chef_run).to update_yum_version_lock('docker-ce')
             .with(
               version: '18.09.2',
               release: '3.el7'
             )
         end
         it do
-          expect(chef_run).to add_yum_version_lock('docker-ce-cli')
+          expect(chef_run).to update_yum_version_lock('docker-ce-cli')
             .with(
               version: '18.09.2',
               release: '3.el7'
