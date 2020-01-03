@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.8.0 (2020-01-03)
+------------------
+- CentOS 8 support
+
 2.7.0 (2019-12-22)
 ------------------
 - Chef 14 post-migration fixes
