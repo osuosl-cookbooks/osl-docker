@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.8.1 (2020-01-08)
+------------------
+- Include firewall::docker in default recipe
+
 2.8.0 (2020-01-03)
 ------------------
 - CentOS 8 support
