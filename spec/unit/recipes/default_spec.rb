@@ -9,8 +9,10 @@ describe 'osl-docker::default' do
       it 'converges successfully' do
         expect { chef_run }.to_not raise_error
       end
-      it do
-        expect(chef_run).to include_recipe 'firewall::prometheus'
+      %w(firewall::docker firewall::prometheus).each do |r|
+        it do
+          expect(chef_run).to include_recipe r
+        end
       end
       it do
         expect(chef_run).to create_firewall_prometheus('docker_exporter').with(port: 9323)

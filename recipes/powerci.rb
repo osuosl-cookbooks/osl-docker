@@ -22,7 +22,6 @@ node.default['firewall']['docker']['range']['4'] = %w(192.168.6.0/24 140.211.168
 node.default['firewall']['docker']['expose_ports'] = true
 
 include_recipe 'osl-docker::default'
-include_recipe 'firewall::docker'
 
 # docker_volume resource does not have support for labels
 execute 'docker volume create --label preserve=true ccache' do
