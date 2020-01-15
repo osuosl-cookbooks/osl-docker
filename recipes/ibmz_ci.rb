@@ -21,7 +21,6 @@ node.default['osl-docker']['tls'] = true
 node.override['osl-docker']['host'] = 'tcp://0.0.0.0:2376'
 
 include_recipe 'osl-docker::default'
-include_recipe 'firewall::docker'
 
 # docker_volume resource does not have support for labels
 execute 'docker volume create --label preserve=true ccache' do

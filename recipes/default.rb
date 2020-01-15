@@ -96,6 +96,7 @@ if node['platform_family'] == 'debian'
   end
 end
 
+include_recipe 'firewall::docker'
 include_recipe 'firewall::prometheus'
 
 firewall_prometheus 'docker_exporter' do
