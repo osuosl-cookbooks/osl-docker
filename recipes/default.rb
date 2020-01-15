@@ -11,10 +11,12 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
+
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 if node['platform_family'] == 'rhel'
   include_recipe 'yum-plugin-versionlock'
 
@@ -30,17 +32,17 @@ if node['platform_family'] == 'rhel'
     end
   end
 
-  yum_version_lock node['osl-docker']['package_cli_name'] do
-    version node['osl-docker']['package']['version']
-    release node['osl-docker']['package_release']
-    epoch 1
-    action :update
-  end
-
   yum_version_lock node['osl-docker']['package']['package_name'] do
     version node['osl-docker']['package']['version']
     release node['osl-docker']['package_release']
     epoch 3
+    action :update
+  end
+
+  yum_version_lock node['osl-docker']['package_cli_name'] do
+    version node['osl-docker']['package']['version']
+    release node['osl-docker']['package_release']
+    epoch 1
     action :update
   end
 

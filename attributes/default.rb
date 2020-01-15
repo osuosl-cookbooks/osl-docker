@@ -6,15 +6,26 @@ when 'rhel'
     "#{default['osl-docker']['package']['version']}-#{default['osl-docker']['package_release']}"
   default['osl-docker']['package']['package_name'] = 'docker-ce'
   default['osl-docker']['package_cli_name'] = 'docker-ce-cli'
+  default['osl-docker']['package']['setup_docker_repo'] = true
+  default['osl-docker']['package']['setup_docker_repo'] = false if node['platform_version'].to_i >= 8
+
 when 'debian'
-  default['osl-docker']['package']['package_name'] = 'docker-ce'
-  default['osl-docker']['package_cli_name'] = 'docker-ce-cli'
-  default['osl-docker']['package']['version'] = '5:18.09.2'
-  default['osl-docker']['package']['package_version'] = '5:18.09.2~3-0~debian-stretch'
+  default['osl-docker']['package']['setup_docker_repo'] = true
+  case node['platform_version'].to_i
+  when 9
+    default['osl-docker']['package']['package_name'] = 'docker-ce'
+    default['osl-docker']['package_cli_name'] = 'docker-ce-cli'
+    default['osl-docker']['package']['version'] = '5:18.09.2'
+    default['osl-docker']['package']['package_version'] = '5:18.09.2~3-0~debian-stretch'
+  when 10
+    default['osl-docker']['package']['package_name'] = 'docker-ce'
+    default['osl-docker']['package_cli_name'] = 'docker-ce-cli'
+    default['osl-docker']['package']['version'] = '5:18.09.2'
+    default['osl-docker']['package']['package_version'] = '5:18.09.2~3-0~debian-buster'
+  end
+
 end
 case node['kernel']['machine']
-when 'x86_64'
-  default['osl-docker']['package']['setup_docker_repo'] = false if node['platform_version'].to_i >= 8
 when 'ppc64le', 's390x'
   default['osl-docker']['package']['setup_docker_repo'] = false
 end
