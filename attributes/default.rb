@@ -6,7 +6,7 @@ when 'rhel'
     "#{default['osl-docker']['package']['version']}-#{default['osl-docker']['package_release']}"
   default['osl-docker']['package']['package_name'] = 'docker-ce'
   default['osl-docker']['package_cli_name'] = 'docker-ce-cli'
-  default['osl-docker']['package']['setup_docker_repo'] = (node['platform_version'].to_i >= 8 ? false: true)
+  default['osl-docker']['package']['setup_docker_repo'] = !(node['platform_version'].to_i >= 8)
 when 'debian'
   default['osl-docker']['package']['setup_docker_repo'] = true
   default['osl-docker']['package']['package_name'] = 'docker-ce'

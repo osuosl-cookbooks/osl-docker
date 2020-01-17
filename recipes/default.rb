@@ -15,7 +15,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 if node['platform_family'] == 'rhel'
   include_recipe 'yum-plugin-versionlock'
 
@@ -95,6 +94,7 @@ if node['platform_family'] == 'debian'
   end
 end
 
+include_recipe 'firewall::docker'
 include_recipe 'firewall::prometheus'
 
 firewall_prometheus 'docker_exporter' do
