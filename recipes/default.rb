@@ -30,17 +30,17 @@ if node['platform_family'] == 'rhel'
     end
   end
 
-  yum_version_lock node['osl-docker']['package_cli_name'] do
-    version node['osl-docker']['package']['version']
-    release node['osl-docker']['package_release']
-    epoch 1
-    action :update
-  end
-
   yum_version_lock node['osl-docker']['package']['package_name'] do
     version node['osl-docker']['package']['version']
     release node['osl-docker']['package_release']
     epoch 3
+    action :update
+  end
+
+  yum_version_lock node['osl-docker']['package_cli_name'] do
+    version node['osl-docker']['package']['version']
+    release node['osl-docker']['package_release']
+    epoch 1
     action :update
   end
 
