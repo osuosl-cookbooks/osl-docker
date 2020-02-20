@@ -106,7 +106,6 @@ docker_installation_package 'default' do
     send(key.to_sym, value)
   end
   action :create
-  notifies :restart, 'docker_service[default]' unless node['osl-docker']['client_only']
 end
 
 directory '/etc/docker'
