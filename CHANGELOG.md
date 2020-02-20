@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.8.2 (2020-02-20)
+------------------
+- Remove restarting docker service on package upgrades
+
 2.8.1 (2020-01-08)
 ------------------
 - Include firewall::docker in default recipe
