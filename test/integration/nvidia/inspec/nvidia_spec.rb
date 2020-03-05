@@ -7,7 +7,7 @@
 
 describe package('nvidia-driver-latest-dkms') do
   it { should be_installed }
-  its('version') { should eq '418.87.01-1.el7' }
+  its('version') { should eq '440.33.01-1.el7' }
 end
 
 describe package('nvidia-docker2') do
@@ -17,7 +17,7 @@ end
 
 describe package('cuda-drivers') do
   it { should be_installed }
-  its('version') { should eq '410.104-1' }
+  its('version') { should eq '440.33.01-1' }
 end
 
 describe docker.info do
