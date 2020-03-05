@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.8.3 (2020-03-05)
+------------------
+- Update nvidia driver to 440.33.01 and CUDA to 10.2
+
 2.8.2 (2020-02-20)
 ------------------
 - Remove restarting docker service on package upgrades
