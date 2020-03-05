@@ -65,7 +65,7 @@ describe 'osl-docker::nvidia' do
           it do
             expect(chef_run).to add_yum_version_lock(pkg)
               .with(
-                version: '418.87.01',
+                version: '440.33.01',
                 release: '1.el7',
                 epoch: 3
               )
@@ -78,7 +78,7 @@ describe 'osl-docker::nvidia' do
         it do
           expect(chef_run).to add_yum_version_lock('cuda-drivers')
             .with(
-              version: '410.104',
+              version: '440.33.01',
               release: '1'
             )
         end
@@ -94,7 +94,7 @@ describe 'osl-docker::nvidia' do
         it do
           expect(chef_run).to add_yum_version_lock('cuda')
             .with(
-              version: '10.0.130',
+              version: '10.2.89',
               release: '1'
             )
         end
