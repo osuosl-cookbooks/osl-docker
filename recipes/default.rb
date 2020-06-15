@@ -2,7 +2,7 @@
 # Cookbook:: osl-docker
 # Recipe:: default
 #
-# Copyright:: 2017, Oregon State University
+# Copyright:: 2017-2020, Oregon State University
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-if node['platform_family'] == 'rhel'
+if platform_family?('rhel')
   include_recipe 'yum-plugin-versionlock'
 
   # Remove repos which were created by chef-yum-docker cookbook that we no longer use
@@ -68,7 +68,7 @@ if node['platform_family'] == 'rhel'
   end
 end
 
-if node['platform_family'] == 'debian'
+if platform_family?('debian')
   package 'dirmngr'
 
   # Remove repos which were created by chef-apt-docker cookbook that we no longer use
