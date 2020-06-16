@@ -109,6 +109,8 @@ task snakeoil: snakeoil_file_path
 desc 'Create an Encrypted Databag Secret'
 task secret_file: encrypted_data_bag_secret_path
 
+require 'cookstyle'
+require 'rubocop/rake_task'
 desc 'Run RuboCop (cookstyle) tests'
 task :style do
   run_command('cookstyle')
