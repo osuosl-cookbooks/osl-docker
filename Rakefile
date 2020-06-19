@@ -112,8 +112,8 @@ task secret_file: encrypted_data_bag_secret_path
 require 'cookstyle'
 require 'rubocop/rake_task'
 desc 'Run RuboCop (cookstyle) tests'
-task :style do
-  run_command('cookstyle')
+RuboCop::RakeTask.new(:style) do |task|
+  task.options << '--display-cop-names'
 end
 
 desc 'Run RSpec (unit) tests'
