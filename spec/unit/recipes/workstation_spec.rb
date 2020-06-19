@@ -15,7 +15,7 @@ describe 'osl-docker::workstation' do
         )
       end
       it do
-        expect(chef_run).to add_magic_shell_environment('DOCKER_HOST').with(
+        expect(chef_run).to add_osl_shell_environment('DOCKER_HOST').with(
           value: 'tcp://127.0.0.1:2375'
         )
       end

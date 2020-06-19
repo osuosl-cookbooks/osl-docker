@@ -154,17 +154,17 @@ end
 node.default['osl-docker']['service']['host'] = ['unix:///var/run/docker.sock']
 node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'].nil?
 
-magic_shell_environment 'DOCKER_HOST' do
+osl_shell_environment 'DOCKER_HOST' do
   value node['osl-docker']['host']
-  not_if { node['osl-docker']['host'].nil? }
+  not_if { node['osl-docker']['host'] == '' }
 end
 
-magic_shell_environment 'DOCKER_TLS_VERIFY' do
+osl_shell_environment 'DOCKER_TLS_VERIFY' do
   value '1'
   only_if { node['osl-docker']['tls'] }
 end
 
-magic_shell_environment 'DOCKER_CERT_PATH' do
+osl_shell_environment 'DOCKER_CERT_PATH' do
   value '/etc/docker/ssl'
   only_if { node['osl-docker']['tls'] }
 end

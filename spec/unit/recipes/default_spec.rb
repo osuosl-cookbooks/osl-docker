@@ -24,7 +24,7 @@ describe 'osl-docker::default' do
         expect(chef_run).to start_docker_service('default')
       end
       it do
-        expect(chef_run).to_not add_magic_shell_environment('DOCKER_HOST')
+        expect(chef_run).to_not add_osl_shell_environment('DOCKER_HOST')
       end
       it do
         expect(chef_run).to create_directory('/etc/docker')
@@ -60,10 +60,10 @@ describe 'osl-docker::default' do
         expect(chef_run).to_not create_certificate_manage('client-fauxhai-local')
       end
       it do
-        expect(chef_run).to_not add_magic_shell_environment('DOCKER_TLS_VERIFY').with(value: '1')
+        expect(chef_run).to_not add_osl_shell_environment('DOCKER_TLS_VERIFY').with(value: '1')
       end
       it do
-        expect(chef_run).to_not add_magic_shell_environment('DOCKER_CERT_PATH').with(value: '/etc/docker/ssl')
+        expect(chef_run).to_not add_osl_shell_environment('DOCKER_CERT_PATH').with(value: '/etc/docker/ssl')
       end
       it do
         expect(chef_run).to create_cron('docker_prune_volumes')
@@ -90,7 +90,7 @@ describe 'osl-docker::default' do
           end.converge(described_recipe)
         end
         it do
-          expect(chef_run).to add_magic_shell_environment('DOCKER_HOST').with(value: 'tcp://127.0.0.1:2375')
+          expect(chef_run).to add_osl_shell_environment('DOCKER_HOST').with(value: 'tcp://127.0.0.1:2375')
         end
         it do
           expect(chef_run).to create_cron('docker_prune_volumes')
@@ -154,13 +154,13 @@ describe 'osl-docker::default' do
             )
         end
         it do
-          expect(chef_run).to add_magic_shell_environment('DOCKER_HOST').with(value: 'tcp://127.0.0.1:2376')
+          expect(chef_run).to add_osl_shell_environment('DOCKER_HOST').with(value: 'tcp://127.0.0.1:2376')
         end
         it do
-          expect(chef_run).to add_magic_shell_environment('DOCKER_TLS_VERIFY').with(value: '1')
+          expect(chef_run).to add_osl_shell_environment('DOCKER_TLS_VERIFY').with(value: '1')
         end
         it do
-          expect(chef_run).to add_magic_shell_environment('DOCKER_CERT_PATH').with(value: '/etc/docker/ssl')
+          expect(chef_run).to add_osl_shell_environment('DOCKER_CERT_PATH').with(value: '/etc/docker/ssl')
         end
         it do
           expect(chef_run).to create_docker_service('default')
