@@ -13,7 +13,7 @@ describe 'osl-docker::client' do
         expect(chef_run.docker_service('default')).to do_nothing
       end
       it do
-        expect(chef_run).to_not add_magic_shell_environment('DOCKER_HOST')
+        expect(chef_run).to_not add_osl_shell_environment('DOCKER_HOST')
       end
       it do
         expect(chef_run).to create_directory('/etc/docker')
@@ -31,10 +31,10 @@ describe 'osl-docker::client' do
         expect(chef_run).to_not create_certificate_manage('client-fauxhai-local')
       end
       it do
-        expect(chef_run).to_not add_magic_shell_environment('DOCKER_TLS_VERIFY').with(value: '1')
+        expect(chef_run).to_not add_osl_shell_environment('DOCKER_TLS_VERIFY').with(value: '1')
       end
       it do
-        expect(chef_run).to_not add_magic_shell_environment('DOCKER_CERT_PATH').with(value: '/etc/docker/ssl')
+        expect(chef_run).to_not add_osl_shell_environment('DOCKER_CERT_PATH').with(value: '/etc/docker/ssl')
       end
       it do
         expect(chef_run.cron('docker_prune_volumes')).to do_nothing
