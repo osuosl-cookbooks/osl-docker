@@ -3,6 +3,14 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.10.0 (2020-06-24)
+------------------
+- Chef 15 compatibility fixes
+
+2.9.0 (2020-01-21)
+------------------
+- Adding Support for Debian 10 and fixing Docker packages
+
 2.8.3 (2020-03-05)
 ------------------
 - Update nvidia driver to 440.33.01 and CUDA to 10.2
