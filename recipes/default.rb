@@ -152,7 +152,7 @@ certificate_manage "client-#{node['fqdn'].tr('.', '-')}" do
 end
 
 node.default['osl-docker']['service']['host'] = ['unix:///var/run/docker.sock']
-node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'].nil?
+node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'] == ''
 
 osl_shell_environment 'DOCKER_HOST' do
   value node['osl-docker']['host']
