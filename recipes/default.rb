@@ -152,11 +152,12 @@ certificate_manage "client-#{node['fqdn'].tr('.', '-')}" do
 end
 
 node.default['osl-docker']['service']['host'] = ['unix:///var/run/docker.sock']
-node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'] == ''
+node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'].nil?
 
-osl_shell_environment 'DOCKER_HOST' do
-  value node['osl-docker']['host']
-  not_if { node['osl-docker']['host'] == '' }
+if node['osl-docker']['host'] # use if instead of not_if to fix nil value validation
+  osl_shell_environment 'DOCKER_HOST' do
+    value node['osl-docker']['host']
+  end
 end
 
 osl_shell_environment 'DOCKER_TLS_VERIFY' do
