@@ -257,7 +257,7 @@ describe 'osl-docker::default' do
         it do
           expect(chef_run).to_not install_package('dirmgr')
         end
-      when DEBIAN_9
+      when DEBIAN_10
         it do
           expect(chef_run).to create_docker_installation_package('default').with(version: '5:18.09.2')
         end
