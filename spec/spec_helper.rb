@@ -11,11 +11,6 @@ CENTOS_7 = {
   version: '7',
 }.freeze
 
-DEBIAN_9 = {
-  platform: 'debian',
-  version: '9',
-}.freeze
-
 DEBIAN_10 = {
   platform: 'debian',
   version: '10',
@@ -24,7 +19,6 @@ DEBIAN_10 = {
 ALL_PLATFORMS = [
   CENTOS_8,
   CENTOS_7,
-  DEBIAN_9,
   DEBIAN_10,
 ].freeze
 
@@ -34,7 +28,6 @@ CENTOS_PLATFORMS = [
 ].freeze
 
 DEBIAN_PLATFORMS = [
-  DEBIAN_9,
   DEBIAN_10,
 ].freeze
 
