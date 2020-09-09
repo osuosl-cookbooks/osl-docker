@@ -116,11 +116,6 @@ end
   end
 end
 
-log 'yum makecache cuda' do
-  message 'yum makecache cuda'
-  only_if { ::File.exist?(makecache_file) }
-end
-
 notify_group 'notify yum makecache cuda' do
   notifies :makecache, 'yum_repository[cuda]', :immediately
   only_if { ::File.exist?(makecache_file) }
