@@ -68,7 +68,7 @@ describe 'osl-docker::default' do
       it do
         expect(chef_run).to create_cron('docker_prune_volumes')
           .with(
-            minute: 15,
+            minute: '15',
             environment: {},
             command: '/usr/bin/docker system prune --volumes -f  > /dev/null'
           )
@@ -76,9 +76,9 @@ describe 'osl-docker::default' do
       it do
         expect(chef_run).to create_cron('docker_prune_images')
           .with(
-            minute: 45,
-            hour: 2,
-            weekday: 0,
+            minute: '45',
+            hour: '2',
+            weekday: '0',
             environment: {},
             command: '/usr/bin/docker system prune -a -f  > /dev/null'
           )
@@ -95,16 +95,16 @@ describe 'osl-docker::default' do
         it do
           expect(chef_run).to create_cron('docker_prune_volumes')
             .with(
-              minute: 15,
+              minute: '15',
               command: '/usr/bin/docker system prune --volumes -f  > /dev/null'
             )
         end
         it do
           expect(chef_run).to create_cron('docker_prune_images')
             .with(
-              minute: 45,
-              hour: 2,
-              weekday: 0,
+              minute: '45',
+              hour: '2',
+              weekday: '0',
               command: '/usr/bin/docker system prune -a -f  > /dev/null'
             )
         end
