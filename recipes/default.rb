@@ -201,15 +201,15 @@ unless node['osl-docker']['prune']['volume_filter'].empty?
 end
 
 cron 'docker_prune_volumes' do
-  minute 15
+  minute '15'
   command "/usr/bin/docker system prune --volumes -f #{volume_filter.join(' ')} > /dev/null"
   not_if { node['osl-docker']['client_only'] }
 end
 
 cron 'docker_prune_images' do
-  minute 45
-  hour 2
-  weekday 0
+  minute '45'
+  hour '2'
+  weekday '0'
   command "/usr/bin/docker system prune -a -f #{volume_filter.join(' ')} > /dev/null"
   not_if { node['osl-docker']['client_only'] }
 end

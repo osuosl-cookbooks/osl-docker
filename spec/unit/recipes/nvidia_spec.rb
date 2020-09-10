@@ -125,11 +125,7 @@ describe 'osl-docker::nvidia' do
         end
 
         it do
-          expect(chef_run.log('yum makecache cuda')).to do_nothing
-        end
-
-        it do
-          expect(chef_run.log('yum makecache cuda')).to notify('yum_repository[cuda]').immediately
+          expect(chef_run.notify_group('notify yum makecache cuda')).to notify('yum_repository[cuda]').immediately
         end
 
         it do
@@ -169,11 +165,7 @@ describe 'osl-docker::nvidia' do
             allow(File).to receive(:exist?).with('/var/chef/cache/makecache-cuda').and_return(true)
           end
           it do
-            expect(chef_run).to write_log('yum makecache cuda').with(message: 'yum makecache cuda')
-          end
-
-          it do
-            expect(chef_run.log('yum makecache cuda')).to notify('yum_repository[cuda]').immediately
+            expect(chef_run.notify_group('notify yum makecache cuda')).to notify('yum_repository[cuda]').immediately
           end
         end
       when DEBIAN_10

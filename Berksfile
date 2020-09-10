@@ -5,6 +5,6 @@ solver :ruby, :required
 cookbook 'base', git: 'git@github.com:osuosl-cookbooks/base'
 cookbook 'docker_test', path: 'test/cookbooks/docker_test'
 cookbook 'firewall', git: 'git@github.com:osuosl-cookbooks/firewall'
-cookbook 'yum-plugin-versionlock', github: 'ramereth/chef-yum-plugin-versionlock', branch: 'centos-8'
+cookbook 'yum-plugin-versionlock', github: 'detjensrobert/chef-yum-plugin-versionlock', branch: 'detjensrobert/idempotency'
 
 metadata
