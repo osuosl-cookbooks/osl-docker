@@ -6,7 +6,7 @@ provisioner:
   name: chef_zero
   data_bags_path: test/integration/data_bags
   encrypted_data_bag_secret_key_path: test/integration/encrypted_data_bag_secret
-  # enforce_idempotency: true # yum_version_lock resource breaks idempotency, runs on every converge
+  # enforce_idempotency: true # versionlock on c7 still has idempotency issues
   # multiple_converge: 2
   deprecations_as_errors: true
 
