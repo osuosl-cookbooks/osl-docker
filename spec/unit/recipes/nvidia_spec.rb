@@ -143,6 +143,10 @@ describe 'osl-docker::nvidia' do
                 config: {
                   'metrics-addr' => '0.0.0.0:9323',
                   'experimental' => true,
+                  'log-opts' => {
+                    'max-size' => '100m',
+                    'max-file' => '10',
+                  },
                   'runtimes' => {
                     'nvidia' => {
                       'path' => 'nvidia-container-runtime',

@@ -1,4 +1,4 @@
-require_relative '../../helpers/inspec/docker_helper.rb'
+require_relative '../../helpers/inspec/docker_helper'
 
 docker_env = 'DOCKER_HOST="tcp://127.0.0.1:2376" DOCKER_CERT_PATH="/etc/docker/ssl" DOCKER_TLS_VERIFY="1"'
 curl_docker = 'curl -v https://127.0.0.1:2376/images/json ' \

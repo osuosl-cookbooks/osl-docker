@@ -36,6 +36,10 @@ describe 'osl-docker::default' do
               config: {
                 'metrics-addr' => '0.0.0.0:9323',
                 'experimental' => true,
+                'log-opts' => {
+                  'max-size' => '100m',
+                  'max-file' => '10',
+                },
               },
             }
           )
@@ -44,7 +48,11 @@ describe 'osl-docker::default' do
         expect(chef_run).to render_file('/etc/docker/daemon.json')
           .with_content('{
   "metrics-addr": "0.0.0.0:9323",
-  "experimental": true
+  "experimental": true,
+  "log-opts": {
+    "max-size": "100m",
+    "max-file": "10"
+  }
 }')
       end
       it do

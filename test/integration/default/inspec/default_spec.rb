@@ -1,10 +1,12 @@
-require_relative '../../helpers/inspec/docker_helper.rb'
+require_relative '../../helpers/inspec/docker_helper'
 
 inspec_docker?
 
 describe json('/etc/docker/daemon.json') do
   its('metrics-addr') { should cmp '0.0.0.0:9323' }
   its('experimental') { should cmp 'true' }
+  its(%w(log-opts max-size)) { should cmp '100m' }
+  its(%w(log-opts max-file)) { should cmp '10' }
 end
 
 describe crontab.where { command =~ /docker system prune --volumes/ } do
