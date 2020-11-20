@@ -23,6 +23,10 @@ default['osl-docker']['daemon'] =
   {
     'metrics-addr' => '0.0.0.0:9323',
     'experimental' => true,
+    'log-opts' => {
+      'max-size' => '100m',
+      'max-file' => '10',
+    },
   }
 default['osl-docker']['prune']['volume_filter'] = []
 default['osl-docker']['tls'] = false

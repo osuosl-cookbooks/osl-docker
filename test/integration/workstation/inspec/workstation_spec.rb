@@ -1,4 +1,4 @@
-require_relative '../../helpers/inspec/docker_helper.rb'
+require_relative '../../helpers/inspec/docker_helper'
 
 inspec_docker?('DOCKER_HOST="tcp://127.0.0.1:2375"')
 
