@@ -69,11 +69,11 @@ when 'debian'
   end
 end
 
-include_recipe 'firewall::docker'
-include_recipe 'firewall::prometheus'
+osl_firewall_docker 'osl-docker'
 
-firewall_prometheus 'docker_exporter' do
-  port 9323
+osl_firewall_port 'docker_exporter' do
+  service_name 'prometheus'
+  ports %w(9323)
 end
 
 docker_installation_package 'default' do

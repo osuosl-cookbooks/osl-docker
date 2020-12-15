@@ -19,6 +19,13 @@ describe iptables do
   end
 end
 
+# make sure firewall isnt allowing IPv6 traffic
+describe ip6tables do
+  it { should_not have_rule('-A docker -p tcp -m tcp --dport 2375 -j ACCEPT') }
+  it { should_not have_rule('-A docker -p tcp -m tcp --dport 2376 -j ACCEPT') }
+  it { should_not have_rule('-A docker -p tcp -m tcp --dport 32768:61000 -j ACCEPT') }
+end
+
 describe command('docker volume inspect ccache') do
   its('exit_status') { should eq 0 }
   its('stdout') { should match(%r{"Mountpoint": "/var/lib/docker/volumes/ccache/_data"}) }

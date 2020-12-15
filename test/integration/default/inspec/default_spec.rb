@@ -29,11 +29,11 @@ describe port(9323) do
 end
 
 describe iptables do
-  it { should have_rule('-A prometheus -s 10.1.0.0/23 -p tcp -m tcp --dport 9323 -j ACCEPT') }
+  it { should have_rule('-A prometheus -p tcp -m tcp --dport 9323 -j osl_only') }
 end
 
 describe ip6tables do
-  it { should have_rule('-A prometheus -s 2605:bc80:3010::/48 -p tcp -m tcp --dport 9323 -j ACCEPT') }
+  it { should have_rule('-A prometheus -p tcp -m tcp --dport 9323 -j osl_only') }
 end
 
 describe http('http://localhost:9323/metrics') do

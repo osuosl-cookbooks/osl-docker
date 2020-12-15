@@ -11,12 +11,12 @@ describe 'osl-docker::default' do
         expect { chef_run }.to_not raise_error
       end
 
-      it { expect(chef_run).to include_recipe('firewall::docker') }
-      it { expect(chef_run).to include_recipe('firewall::prometheus') }
+      it { expect(chef_run).to accept_osl_firewall_docker('osl-docker') }
 
       it do
-        expect(chef_run).to create_firewall_prometheus('docker_exporter').with(
-          port: 9323
+        expect(chef_run).to accept_osl_firewall_port('docker_exporter').with(
+          service_name: 'prometheus',
+          ports: %w(9323)
         )
       end
 
