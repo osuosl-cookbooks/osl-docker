@@ -245,7 +245,7 @@ describe 'osl-docker::default' do
           docker-test
         ).each do |r|
           it do
-            expect(chef_run).to delete_yum_repository(r)
+            expect(chef_run).to remove_yum_repository(r)
           end
         end
         it do
