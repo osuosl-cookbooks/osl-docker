@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.10.2 (2021-01-26)
+-------------------
+- Cookstyle fixes
+
 2.10.1 (2020-11-20)
 -------------------
 - Enable log rotation for containers
