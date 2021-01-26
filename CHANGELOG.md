@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.11.0 (2021-01-26)
+-------------------
+- Bump to docker-7.6.1 cookbook
+
 2.10.2 (2021-01-26)
 -------------------
 - Cookstyle fixes
