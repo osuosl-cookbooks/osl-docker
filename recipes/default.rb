@@ -2,7 +2,7 @@
 # Cookbook:: osl-docker
 # Recipe:: default
 #
-# Copyright:: 2017-2020, Oregon State University
+# Copyright:: 2017-2021, Oregon State University
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ if platform_family?('rhel')
     docker-test
   ).each do |r|
     yum_repository r do
-      action :delete
+      action :remove
     end
   end
 
