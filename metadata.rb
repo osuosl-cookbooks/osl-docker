@@ -15,7 +15,7 @@ depends          'docker', '~> 7.6.1'
 depends          'firewall', '>= 4.4.4'
 depends          'yum-epel'
 depends          'yum-nvidia'
-depends          'yum-plugin-versionlock'
+depends          'yum-plugin-versionlock', '>= 0.4.0'
 
 supports         'centos', '~> 8.0'
 supports         'centos', '~> 7.0'
