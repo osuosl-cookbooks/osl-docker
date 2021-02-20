@@ -20,7 +20,7 @@ module OslDocker
       def osl_docker_package_version_string
         case node['platform_family']
         when 'rhel'
-          "#{osl_docker_version}-#{osl_docker_release}"
+          "3:#{osl_docker_version}-#{osl_docker_release}"
         when 'debian'
           "5:#{osl_docker_version}~3-0~debian-#{node['lsb']['codename']}"
         end

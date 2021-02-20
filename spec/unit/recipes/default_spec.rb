@@ -119,7 +119,7 @@ describe 'osl-docker::default' do
 
         it do
           expect(chef_run).to create_docker_installation_package('default').with(
-            package_version: '18.09.2-3.el7',
+            package_version: '3:18.09.2-3.el7',
             package_name: 'docker-ce',
             setup_docker_repo: (p == CENTOS_7)
           )
