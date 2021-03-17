@@ -15,33 +15,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-if platform_family?('rhel')
+
+case node['platform_family']
+when 'rhel'
   include_recipe 'yum-plugin-versionlock'
 
-  # Remove repos which were created by chef-yum-docker cookbook that we no longer use
-  %w(
-    docker-main
-    docker-stable
-    docker-edge
-    docker-test
-  ).each do |r|
-    yum_repository r do
-      action :remove
-    end
-  end
-
-  yum_version_lock node['osl-docker']['package']['package_name'] do
-    version node['osl-docker']['package']['version']
-    release node['osl-docker']['package_release']
+  yum_version_lock osl_docker_package_name do
+    version osl_docker_version
+    release osl_docker_release
     epoch 3
-    action :update
   end
 
-  yum_version_lock node['osl-docker']['package_cli_name'] do
-    version node['osl-docker']['package']['version']
-    release node['osl-docker']['package_release']
+  yum_version_lock osl_docker_cli_package_name do
+    version osl_docker_version
+    release osl_docker_release
     epoch 1
-    action :update
   end
 
   # Use our docker repo for ppc64le & s390x
@@ -54,7 +42,7 @@ if platform_family?('rhel')
     only_if { %w(ppc64le s390x).include?(node['kernel']['machine']) }
   end
 
-  # TODO: Use CentOS 7 repo on CentOS 8 until upstream has created the repo
+  # Use CentOS 7 repo on CentOS 8 since Docker is not officially supported on C8
   yum_repository 'Docker' do
     baseurl 'https://download.docker.com/linux/centos/7/x86_64/stable'
     gpgkey 'https://download.docker.com/linux/centos/gpg'
@@ -66,31 +54,18 @@ if platform_family?('rhel')
     options(module_hotfixes: true)
     only_if { node['platform_version'].to_i >= 8 && node['kernel']['machine'] == 'x86_64' }
   end
-end
 
-if platform_family?('debian')
+when 'debian'
   package 'dirmngr'
 
-  # Remove repos which were created by chef-apt-docker cookbook that we no longer use
-  %w(
-    docker-main
-    docker-stable
-    docker-edge
-    docker-test
-  ).each do |r|
-    apt_repository r do
-      action :remove
-    end
+  apt_preference osl_docker_package_name do
+    pin "version #{osl_docker_package_version_string}"
+    pin_priority '1001'
   end
 
-  [
-    node['osl-docker']['package']['package_name'],
-    node['osl-docker']['package_cli_name'],
-  ].each do |p|
-    apt_preference p do
-      pin "version #{node['osl-docker']['package']['version']}*"
-      pin_priority '1001'
-    end
+  apt_preference osl_docker_cli_package_name do
+    pin "version #{osl_docker_package_version_string}"
+    pin_priority '1001'
   end
 end
 
@@ -102,9 +77,9 @@ firewall_prometheus 'docker_exporter' do
 end
 
 docker_installation_package 'default' do
-  node['osl-docker']['package'].each do |key, value|
-    send(key.to_sym, value)
-  end
+  package_version osl_docker_package_version_string
+  package_name osl_docker_package_name
+  setup_docker_repo osl_docker_setup_repo?
   action :create
 end
 
