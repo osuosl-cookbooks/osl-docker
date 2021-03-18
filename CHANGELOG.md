@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.12.1 (2021-03-18)
+-------------------
+- Use correct ppc64le arch string
+
 2.12.0 (2021-03-17)
 -------------------
 - Idempotency fixes
