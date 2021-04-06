@@ -6,7 +6,7 @@ chef_version     '>= 16.0'
 issues_url       'https://github.com/osuosl-cookbooks/osl-docker/issues'
 source_url       'https://github.com/osuosl-cookbooks/osl-docker'
 description      'Installs/Configures osl-docker'
-version          '2.12.1'
+version          '2.13.0'
 
 depends          'apt'
 depends          'certificate'

@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+2.13.0 (2021-04-06)
+-------------------
+- Update Chef dependency to >= 16
+
 2.12.1 (2021-03-18)
 -------------------
 - Use correct ppc64le arch string
