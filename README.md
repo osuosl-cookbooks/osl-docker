@@ -1,9 +1,8 @@
 osl-docker Cookbook
 ===================
 
-OSL wrapper cookbook using
-[docker](https://supermarket.chef.io/cookbooks/docker) as a base. It installs
-the docker package from Docker Inc. and starts the docker service.
+OSL wrapper cookbook using [docker](https://supermarket.chef.io/cookbooks/docker) as a base. It installs the docker
+package from Docker Inc. and starts the docker service.
 
 Requirements
 ------------
@@ -13,14 +12,11 @@ Requirements
 Attributes
 ----------
 
-- ``node['osl-docker']['package']`` -- Key/value hash which directly relates to
-  the ``docker_installation_package`` resource.
-- ``node['osl-docker']['service'] `` -- Key/value hash which directly relates to
-  the ``docker_service``.
-- ``node['osl-docker']['tls']`` -- Boolean for enabling TLS for the docker
-  service. Default: ``false``
-- ``node['osl-docker']['data_bag']`` -- Name of the data bag to find the TLS
-  certificates. Default: ``docker``
+- ``node['osl-docker']['package']`` -- Key/value hash which directly relates to the ``docker_installation_package``
+  resource.
+- ``node['osl-docker']['service'] `` -- Key/value hash which directly relates to the ``docker_service``.
+- ``node['osl-docker']['tls']`` -- Boolean for enabling TLS for the docker service. Default: ``false``
+- ``node['osl-docker']['data_bag']`` -- Name of the data bag to find the TLS certificates. Default: ``docker``
 
 For example, if you wish to set the package version you could do the following:
 
@@ -28,8 +24,7 @@ For example, if you wish to set the package version you could do the following:
 node['osl-docker']['package']['version'] = '1.13.1'
 ```
 
-If you wish to have have docker to listen on TCP instead of a socket, you can do
-the following:
+If you wish to have have docker to listen on TCP instead of a socket, you can do the following:
 
 ``` ruby
 node['osl-docker']['service']['host'] = 'tcp://0.0.0.0:2375'
@@ -38,21 +33,17 @@ node['osl-docker']['service']['host'] = 'tcp://0.0.0.0:2375'
 TLS
 ---
 
-If you wish to enable TLS for the docker daemon, you need to set the
-``node['osl-docker']['tls']`` attribute to ``true`` and also create TWO data bag
-items using the FQDN of the host as part of the name (replacing periods with
-dashes). One data bag item is for the server certificates and the other is for
-the client certificates. These all need to be created from a certificate
-authority that we manage internally using easy-rsa.
+If you wish to enable TLS for the docker daemon, you need to set the ``node['osl-docker']['tls']`` attribute to
+``true`` and also create TWO data bag items using the FQDN of the host as part of the name (replacing periods with
+dashes). One data bag item is for the server certificates and the other is for the client certificates. These all need
+to be created from a certificate authority that we manage internally using easy-rsa.
 
-For example, if we created certificates for foo.example.org, we would create a
-one data bag item named ``server-foo-example-org.json`` which includes the CA
-cert (as the ``chain_file``), cert and key for the server. Then you also need to
-create a data bag item named ``client-foo-example-org.json`` which contains the
-client certs.  The CA cert should be the same for this one as well.
+For example, if we created certificates for foo.example.org, we would create a one data bag item named
+``server-foo-example-org.json`` which includes the CA cert (as the ``chain_file``), cert and key for the server. Then
+you also need to create a data bag item named ``client-foo-example-org.json`` which contains the client certs.  The CA
+cert should be the same for this one as well.
 
-Here's an example of what should be in the encrypted data bag item (without
-showing any certs).
+Here's an example of what should be in the encrypted data bag item (without showing any certs).
 
 Server data bag item:
 
