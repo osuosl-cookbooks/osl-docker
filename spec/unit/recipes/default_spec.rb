@@ -47,6 +47,8 @@ describe 'osl-docker::default' do
 
       it do
         expect(chef_run).to create_docker_service('default').with(
+          host: %w(unix:///var/run/docker.sock),
+          misc_opts: '--live-restore',
           install_method: 'none'
         )
       end
