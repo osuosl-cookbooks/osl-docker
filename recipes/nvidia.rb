@@ -86,6 +86,7 @@ yum_version_lock 'nvidia-docker2' do
   version version_lock['nvidia-docker2']['version']
   release version_lock['nvidia-docker2']['release']
   notifies :touch, "file[#{makecache_file}]", :immediately
+  action :remove
 end
 
 yum_version_lock 'cuda' do
@@ -95,7 +96,7 @@ yum_version_lock 'cuda' do
 end
 
 # Exclude any versions that conflict with what we want
-%w(440).each do |ver|
+%w(440 450 455 460 465 470).each do |ver|
   [
     "nvidia-driver-branch-#{ver}",
     "nvidia-driver-branch-#{ver}-cuda",
