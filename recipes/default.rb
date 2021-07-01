@@ -101,6 +101,7 @@ certificate_manage "client-#{node['fqdn'].tr('.', '-')}" do
   only_if { node['osl-docker']['tls'] }
 end
 
+node.default['osl-docker']['service']['misc_opts'] = '--live-restore'
 node.default['osl-docker']['service']['host'] = ['unix:///var/run/docker.sock']
 node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'].nil?
 

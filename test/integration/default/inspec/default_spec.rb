@@ -2,6 +2,10 @@ require_relative '../../helpers/inspec/docker_helper'
 
 inspec_docker?
 
+describe docker.info do
+  its('LiveRestoreEnabled') { should eq true }
+end
+
 describe json('/etc/docker/daemon.json') do
   its('metrics-addr') { should cmp '0.0.0.0:9323' }
   its('experimental') { should cmp 'true' }
