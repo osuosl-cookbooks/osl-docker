@@ -18,54 +18,34 @@
 
 case node['platform_family']
 when 'rhel'
+  # TODO: Remove the yum-plugin-versionlock after this has been run on the nodes
   include_recipe 'yum-plugin-versionlock'
 
   yum_version_lock osl_docker_package_name do
     version osl_docker_version
     release osl_docker_release
     epoch 3
+    action :remove
   end
 
   yum_version_lock osl_docker_cli_package_name do
     version osl_docker_version
     release osl_docker_release
     epoch 1
+    action :remove
   end
-
-  # Use our docker repo for ppc64le & s390x
-  yum_repository 'Docker' do
-    baseurl 'https://ftp.osuosl.org/pub/osl/repos/yum/$releasever/docker-stable/$basearch'
-    gpgkey 'https://ftp.osuosl.org/pub/osl/repos/yum/RPM-GPG-KEY-osuosl'
-    description 'Docker Stable repository'
-    gpgcheck true
-    enabled true
-    only_if { %w(ppc64le s390x).include?(node['kernel']['machine']) }
-  end
-
-  # Use CentOS 7 repo on CentOS 8 since Docker is not officially supported on C8
-  yum_repository 'Docker' do
-    baseurl 'https://download.docker.com/linux/centos/7/x86_64/stable'
-    gpgkey 'https://download.docker.com/linux/centos/gpg'
-    description 'Docker Stable repository'
-    gpgcheck true
-    enabled true
-    # Enable all rpms to workaround modularity issue:
-    # https://forums.docker.com/t/yum-repo-for-centos-8/81884/8
-    options(module_hotfixes: true)
-    only_if { node['platform_version'].to_i >= 8 && node['kernel']['machine'] == 'x86_64' }
-  end
-
 when 'debian'
-  package 'dirmngr'
-
+  # TODO: Remove apt pinning after this has been run on the nodes
   apt_preference osl_docker_package_name do
     pin "version #{osl_docker_package_version_string}"
     pin_priority '1001'
+    action :remove
   end
 
   apt_preference osl_docker_cli_package_name do
     pin "version #{osl_docker_package_version_string}"
     pin_priority '1001'
+    action :remove
   end
 end
 
@@ -76,12 +56,7 @@ osl_firewall_port 'docker_exporter' do
   ports %w(9323)
 end
 
-docker_installation_package 'default' do
-  package_version osl_docker_package_version_string
-  package_name osl_docker_package_name
-  setup_docker_repo osl_docker_setup_repo?
-  action :create
-end
+docker_installation_package 'default'
 
 directory '/etc/docker'
 
@@ -159,13 +134,11 @@ docker_service 'default' do
     tls_client_cert '/etc/docker/ssl/cert.pem'
     tls_client_key '/etc/docker/ssl/key.pem'
   end
-  not_if { node['osl-docker']['client_only'] }
-  action [:create, :start]
-end
-
-service 'docker' do
-  action [:disable, :stop]
-  only_if { node['osl-docker']['client_only'] }
+  if node['osl-docker']['client_only']
+    action [:stop]
+  else
+    action [:create, :start]
+  end
 end
 
 volume_filter = []
