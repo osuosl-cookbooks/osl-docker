@@ -15,9 +15,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 case node['platform_family']
 when 'rhel'
+  include_recipe 'osl-selinux'
   include_recipe 'yum-plugin-versionlock'
 
   yum_version_lock osl_docker_package_name do

@@ -26,6 +26,9 @@ describe 'osl-docker::compose' do
             end.converge(described_recipe)
           end
           it do
+            expect(chef_run).to include_recipe 'osl-selinux'
+          end
+          it do
             expect(chef_run).to create_remote_file('/usr/local/bin/docker-compose')
               .with(
                 source: 'http://ftp.osuosl.org/pub/osl/openpower/docker-compose/1.18.0/docker-compose-Linux-ppc64le',
@@ -33,6 +36,10 @@ describe 'osl-docker::compose' do
                 mode: '0755'
               )
           end
+        end
+      when CENTOS_8
+        it do
+          expect(chef_run).to include_recipe 'osl-selinux'
         end
       end
     end
