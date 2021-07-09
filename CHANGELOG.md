@@ -3,6 +3,18 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.1.1 (2021-07-01)
+------------------
+- Various fixes for nvidia-docker
+
+4.1.0 (2021-07-01)
+------------------
+- Enable live restore globally
+
+4.0.0 (2021-07-01)
+------------------
+- Install latest docker and remove version pinning
+
 3.0.0 (2021-05-25)
 ------------------
 - Update to new osl-firewall resources

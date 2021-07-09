@@ -10,7 +10,7 @@ def inspec_docker?(docker_env = '')
 
   %w(docker dockerd).each do |cmd|
     describe command("#{cmd} --version") do
-      its('stdout') { should match(/18\.09\.2/) }
+      its('stdout') { should match(/20.10/) }
     end
   end
 

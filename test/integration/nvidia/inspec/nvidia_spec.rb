@@ -10,7 +10,6 @@ end
 
 describe package('nvidia-docker2') do
   it { should be_installed }
-  its('version') { should eq '2.0.3-1.docker18.09.2.ce' }
 end
 
 describe package('cuda-drivers') do

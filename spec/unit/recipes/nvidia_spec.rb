@@ -84,7 +84,7 @@ describe 'osl-docker::nvidia' do
         end
 
         it do
-          expect(chef_run).to add_yum_version_lock('nvidia-docker2')
+          expect(chef_run).to remove_yum_version_lock('nvidia-docker2')
             .with(
               version: '2.0.3',
               release: '1.docker18.09.2.ce'
@@ -98,7 +98,7 @@ describe 'osl-docker::nvidia' do
               release: '1'
             )
         end
-        %w(440).each do |ver|
+        %w(440 450 455 460 465 470).each do |ver|
           [
             "nvidia-driver-branch-#{ver}",
             "nvidia-driver-branch-#{ver}-cuda",
