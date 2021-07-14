@@ -87,6 +87,10 @@ describe 'osl-docker::default' do
 
       case p
       when CENTOS_7, CENTOS_8
+        it do
+          expect(chef_run).to include_recipe('osl-selinux')
+        end
+
         it { expect(chef_run).to include_recipe('yum-plugin-versionlock') }
 
         it do
