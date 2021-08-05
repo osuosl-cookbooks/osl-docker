@@ -3,6 +3,7 @@ default['osl-docker']['daemon'] =
   {
     'metrics-addr' => '0.0.0.0:9323',
     'experimental' => true,
+    'ip6tables' => true,
     'log-opts' => {
       'max-size' => '100m',
       'max-file' => '10',
