@@ -57,7 +57,15 @@ osl_firewall_port 'docker_exporter' do
   ports %w(9323)
 end
 
-docker_installation_package 'default'
+docker_service 'default' do
+  node['osl-docker']['service'].each do |key, value|
+    send(key.to_sym, value)
+  end
+  # Don't try to install docker twice since we do it above
+  install_method 'auto'
+  action :create
+end
+
 
 directory '/etc/docker'
 
@@ -139,7 +147,7 @@ docker_service 'default' do
   if node['osl-docker']['client_only']
     action [:stop]
   else
-    action [:create, :start]
+    action [:start]
   end
 end
 
