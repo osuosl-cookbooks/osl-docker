@@ -32,7 +32,7 @@ describe 'osl-docker::client' do
       it { expect(chef_run.cron('docker_prune_volumes')).to do_nothing }
       it { expect(chef_run.cron('docker_prune_images')).to do_nothing }
       it { expect(chef_run).to stop_docker_service('default') }
-      it { expect(chef_run).to create_docker_installation_package('default') }
+      it { expect(chef_run).to create_docker_service('default') }
 
       case p
       when CENTOS_7

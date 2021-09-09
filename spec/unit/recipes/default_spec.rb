@@ -44,16 +44,15 @@ describe 'osl-docker::default' do
       it { expect(chef_run).to_not add_osl_shell_environment('DOCKER_TLS_VERIFY') }
       it { expect(chef_run).to_not add_osl_shell_environment('DOCKER_CERT_PATH') }
       it { expect(chef_run).to_not add_osl_shell_environment('DOCKER_HOST') }
-      it { expect(chef_run).to create_docker_installation_package('default') }
+      it { expect(chef_run).to create_docker_service('default') }
 
       it do
-        expect(chef_run).to create_docker_service('default').with(
+        expect(chef_run).to start_docker_service('default').with(
           host: %w(unix:///var/run/docker.sock),
           misc_opts: '--live-restore',
           install_method: 'none'
         )
       end
-      it { expect(chef_run).to start_docker_service('default') }
 
       it do
         expect(chef_run).to create_cron('docker_prune_volumes').with(
@@ -198,7 +197,7 @@ describe 'osl-docker::default' do
         end
 
         it do
-          expect(chef_run).to create_docker_service('default').with(
+          expect(chef_run).to start_docker_service('default').with(
             install_method: 'none',
             tls_verify: true,
             tls_ca_cert: '/etc/docker/ssl/ca.pem',

@@ -66,7 +66,6 @@ docker_service 'default' do
   action :create
 end
 
-
 directory '/etc/docker'
 
 template '/etc/docker/daemon.json' do
