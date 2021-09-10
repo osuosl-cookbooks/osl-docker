@@ -61,7 +61,6 @@ docker_service 'default' do
   node['osl-docker']['service'].each do |key, value|
     send(key.to_sym, value)
   end
-  # Don't try to install docker twice since we do it above
   install_method 'auto'
   action :create
 end
