@@ -75,12 +75,10 @@ docker_service 'default' do
   end
   if node['osl-docker']['client_only']
     action [:create, :stop]
+  elsif !node['osl-docker']['tls'] || ::File.exist?('/etc/docker/ssl/key.pem')
+    action [:create, :start]
   else
-    if !node['osl-docker']['tls'] || ::File.exist?('/etc/docker/ssl/key.pem')
-      action [:create, :start]
-    else
-      action [:create]
-    end
+    action [:create]
   end
 end
 
