@@ -57,7 +57,30 @@ osl_firewall_port 'docker_exporter' do
   ports %w(9323)
 end
 
-docker_installation_package 'default'
+node.default['osl-docker']['service']['misc_opts'] = '--live-restore'
+node.default['osl-docker']['service']['host'] = ['unix:///var/run/docker.sock']
+node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'].nil?
+
+docker_service 'default' do
+  node['osl-docker']['service'].each do |key, value|
+    send(key.to_sym, value)
+  end
+  if node['osl-docker']['tls'] && ::File.exist?('/etc/docker/ssl/key.pem')
+    tls_verify true
+    tls_ca_cert '/etc/docker/ssl/ca.pem'
+    tls_server_cert '/etc/docker/ssl/server.pem'
+    tls_server_key '/etc/docker/ssl/server-key.pem'
+    tls_client_cert '/etc/docker/ssl/cert.pem'
+    tls_client_key '/etc/docker/ssl/key.pem'
+  end
+  if node['osl-docker']['client_only']
+    action [:create, :stop]
+  elsif !node['osl-docker']['tls'] || ::File.exist?('/etc/docker/ssl/key.pem')
+    action [:create, :start]
+  else
+    action [:create]
+  end
+end
 
 directory '/etc/docker'
 
@@ -75,6 +98,7 @@ directory '/etc/docker/ssl' do
   mode '0750'
   recursive true
   only_if { node['osl-docker']['tls'] }
+  notifies :restart, 'docker_service[default]'
 end
 
 certificate_manage "server-#{node['fqdn'].tr('.', '-')}" do
@@ -100,11 +124,8 @@ certificate_manage "client-#{node['fqdn'].tr('.', '-')}" do
   group 'docker'
   create_subfolders false
   only_if { node['osl-docker']['tls'] }
+  notifies :restart, 'docker_service[default]'
 end
-
-node.default['osl-docker']['service']['misc_opts'] = '--live-restore'
-node.default['osl-docker']['service']['host'] = ['unix:///var/run/docker.sock']
-node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'].nil?
 
 if node['osl-docker']['host'] # use if instead of not_if to fix nil value validation
   osl_shell_environment 'DOCKER_HOST' do
@@ -115,32 +136,13 @@ end
 osl_shell_environment 'DOCKER_TLS_VERIFY' do
   value '1'
   only_if { node['osl-docker']['tls'] }
+  notifies :restart, 'docker_service[default]'
 end
 
 osl_shell_environment 'DOCKER_CERT_PATH' do
   value '/etc/docker/ssl'
   only_if { node['osl-docker']['tls'] }
-end
-
-docker_service 'default' do
-  node['osl-docker']['service'].each do |key, value|
-    send(key.to_sym, value)
-  end
-  # Don't try to install docker twice since we do it above
-  install_method 'none'
-  if node['osl-docker']['tls']
-    tls_verify true
-    tls_ca_cert '/etc/docker/ssl/ca.pem'
-    tls_server_cert '/etc/docker/ssl/server.pem'
-    tls_server_key '/etc/docker/ssl/server-key.pem'
-    tls_client_cert '/etc/docker/ssl/cert.pem'
-    tls_client_key '/etc/docker/ssl/key.pem'
-  end
-  if node['osl-docker']['client_only']
-    action [:stop]
-  else
-    action [:create, :start]
-  end
+  notifies :restart, 'docker_service[default]'
 end
 
 volume_filter = []

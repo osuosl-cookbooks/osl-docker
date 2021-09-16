@@ -29,6 +29,8 @@ suites:
         tls: true
     driver_config:
       server_name: default_tls
+    provisioner:
+      multiple_converge: 3
   - name: client
     run_list:
       - recipe[osl-docker::client]
@@ -52,6 +54,8 @@ suites:
       - recipe[osl-docker::ibmz_ci]
     driver_config:
       server_name: ibmz_ci
+    provisioner:
+      multiple_converge: 3
     excludes:
       - debian-10
   - name: workstation

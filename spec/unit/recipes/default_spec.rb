@@ -44,16 +44,13 @@ describe 'osl-docker::default' do
       it { expect(chef_run).to_not add_osl_shell_environment('DOCKER_TLS_VERIFY') }
       it { expect(chef_run).to_not add_osl_shell_environment('DOCKER_CERT_PATH') }
       it { expect(chef_run).to_not add_osl_shell_environment('DOCKER_HOST') }
-      it { expect(chef_run).to create_docker_installation_package('default') }
 
       it do
         expect(chef_run).to create_docker_service('default').with(
           host: %w(unix:///var/run/docker.sock),
-          misc_opts: '--live-restore',
-          install_method: 'none'
+          misc_opts: '--live-restore'
         )
       end
-      it { expect(chef_run).to start_docker_service('default') }
 
       it do
         expect(chef_run).to create_cron('docker_prune_volumes').with(
@@ -137,6 +134,11 @@ describe 'osl-docker::default' do
       end
 
       context 'Enable TLS' do
+        before do
+          allow(File).to receive(:exist?).and_call_original
+          allow(File).to receive(:exist?).with('/etc/docker/ssl/key.pem').and_return(true)
+        end
+
         cached(:chef_run) do
           ChefSpec::SoloRunner.new(p) do |node|
             node.normal['osl-docker']['tls'] = true
@@ -151,6 +153,7 @@ describe 'osl-docker::default' do
             recursive: true
           )
         end
+        it { expect(chef_run.directory('/etc/docker/ssl')).to notify('docker_service[default]').to(:restart) }
 
         it do
           expect(chef_run).to create_certificate_manage('server-fauxhai-local').with(
@@ -178,6 +181,7 @@ describe 'osl-docker::default' do
             create_subfolders: false
           )
         end
+        it { expect(chef_run.certificate_manage('client-fauxhai-local')).to notify('docker_service[default]').to(:restart) }
 
         it do
           expect(chef_run).to add_osl_shell_environment('DOCKER_HOST').with(
@@ -199,7 +203,6 @@ describe 'osl-docker::default' do
 
         it do
           expect(chef_run).to create_docker_service('default').with(
-            install_method: 'none',
             tls_verify: true,
             tls_ca_cert: '/etc/docker/ssl/ca.pem',
             tls_server_cert: '/etc/docker/ssl/server.pem',
