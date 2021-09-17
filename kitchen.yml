@@ -44,11 +44,13 @@ suites:
     excludes:
       - centos-8 # TODO: Add back after we upgrade to version 440 or later
       - debian-10
+      - debian-11
   - name: powerci
     run_list:
       - recipe[osl-docker::powerci]
     excludes:
       - debian-10
+      - debian-11
   - name: ibmz_ci
     run_list:
       - recipe[osl-docker::ibmz_ci]
@@ -58,6 +60,7 @@ suites:
       multiple_converge: 3
     excludes:
       - debian-10
+      - debian-11
   - name: workstation
     run_list:
       - recipe[osl-docker::workstation]
