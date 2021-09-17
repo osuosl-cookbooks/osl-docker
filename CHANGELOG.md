@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.3.1 (2021-09-17)
+------------------
+- Debian 11 support
+
 4.3.0 (2021-09-16)
 ------------------
 - Fixed idempotency errors with the client recipe
