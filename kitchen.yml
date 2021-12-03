@@ -43,6 +43,7 @@ suites:
       - recipe[osl-docker::nvidia]
     excludes:
       - centos-8 # TODO: Add back after we upgrade to version 440 or later
+      - centos_stream-8 # TODO: Add back after we upgrade to version 440 or later
       - debian-10
       - debian-11
   - name: powerci
@@ -67,3 +68,4 @@ suites:
     excludes:
       - centos-7
       - centos-8
+      - centos_stream-8
