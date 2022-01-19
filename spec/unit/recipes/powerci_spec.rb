@@ -33,15 +33,6 @@ describe 'osl-docker::powerci' do
         )
       end
 
-      it do
-        expect(chef_run).to accept_osl_firewall_docker('osl-docker').with(
-          allowed_ipv4: %w(192.168.6.0/24 140.211.168.207/32),
-          allowed_ipv6: [],
-          osl_only: false,
-          expose_ports: true
-        )
-      end
-
       it { expect(chef_run).to run_execute('docker volume create --label preserve=true ccache') }
 
       context 'ccache volume already exists' do

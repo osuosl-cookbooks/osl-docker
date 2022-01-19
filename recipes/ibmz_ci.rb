@@ -16,14 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 node.default['osl-docker']['prune']['volume_filter'] = %w(label!=preserve=true)
-node.default['osl-docker']['tls'] = true
-node.override['osl-docker']['host'] = 'tcp://0.0.0.0:2376'
+node.override['osl-docker']['host'] = 'tcp://0.0.0.0:2375'
 
 include_recipe 'osl-docker::default'
-
-edit_resource!(:osl_firewall_docker, 'osl-docker') do
-  expose_ports true
-end
 
 # docker_volume resource does not have support for labels
 execute 'docker volume create --label preserve=true ccache' do

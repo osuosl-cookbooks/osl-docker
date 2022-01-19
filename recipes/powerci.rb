@@ -21,13 +21,6 @@ node.default['osl-docker']['prune']['volume_filter'] = %w(label!=preserve=true)
 
 include_recipe 'osl-docker::default'
 
-edit_resource!(:osl_firewall_docker, 'osl-docker') do
-  allowed_ipv4 %w(192.168.6.0/24 140.211.168.207/32)
-  allowed_ipv6 []
-  expose_ports true
-  osl_only false
-end
-
 # docker_volume resource does not have support for labels
 execute 'docker volume create --label preserve=true ccache' do
   not_if 'docker volume inspect ccache'

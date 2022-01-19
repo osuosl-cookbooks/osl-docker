@@ -1,10 +1,10 @@
 require_relative '../../helpers/inspec/docker_helper.rb/'
 
-docker_env = 'DOCKER_HOST="tcp://0.0.0.0:2376" DOCKER_CERT_PATH="/etc/docker/ssl" DOCKER_TLS_VERIFY="1"'
+docker_env = 'DOCKER_HOST="tcp://0.0.0.0:2375"'
 
 inspec_docker?(docker_env)
 
-describe port(2376) do
+describe port(2375) do
   it { should be_listening }
 end
 

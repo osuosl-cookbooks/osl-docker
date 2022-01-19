@@ -11,21 +11,6 @@ describe crontab do
   its('commands') { should include '/usr/bin/docker system prune -a -f --filter label!=preserve=true > /dev/null' }
 end
 
-describe iptables do
-  ['192.168.6.0/24', '140.211.168.207/32'].each do |ip|
-    it { should have_rule("-A docker -s #{ip} -p tcp -m tcp --dport 2375 -j ACCEPT") }
-    it { should have_rule("-A docker -s #{ip} -p tcp -m tcp --dport 2376 -j ACCEPT") }
-    it { should have_rule("-A docker -s #{ip} -p tcp -m tcp --dport 32768:61000 -j ACCEPT") }
-  end
-end
-
-# make sure firewall isnt allowing IPv6 traffic
-describe ip6tables do
-  it { should_not have_rule('-A docker -p tcp -m tcp --dport 2375 -j ACCEPT') }
-  it { should_not have_rule('-A docker -p tcp -m tcp --dport 2376 -j ACCEPT') }
-  it { should_not have_rule('-A docker -p tcp -m tcp --dport 32768:61000 -j ACCEPT') }
-end
-
 describe command('docker volume inspect ccache') do
   its('exit_status') { should eq 0 }
   its('stdout') { should match(%r{"Mountpoint": "/var/lib/docker/volumes/ccache/_data"}) }
