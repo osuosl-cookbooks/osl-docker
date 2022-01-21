@@ -173,49 +173,6 @@ describe 'osl-docker::nvidia' do
             expect(chef_run.notify_group('notify yum makecache cuda')).to notify('yum_repository[cuda]').immediately
           end
         end
-      when DEBIAN_10
-        %w(
-          yum-epel
-          yum-nvidia
-          build-essential
-          osl-docker
-          yum-plugin-versionlock
-        ).each do |r|
-          it do
-            expect(chef_run).to_not include_recipe(r)
-          end
-        end
-
-        %w(
-          dkms-nvidia
-          nvidia-driver
-          nvidia-driver-cuda
-          nvidia-driver-cuda-libs
-          nvidia-driver-devel
-          nvidia-driver-latest-dkms
-          nvidia-driver-latest-dkms-cuda
-          nvidia-driver-latest-dkms-cuda-libs
-          nvidia-driver-latest-dkms-devel
-          nvidia-driver-latest-dkms-NvFBCOpenGL
-          nvidia-driver-latest-dkms-NVML
-          nvidia-driver-libs
-          nvidia-driver-NvFBCOpenGL
-          nvidia-driver-NVML
-          nvidia-libXNVCtrl
-          nvidia-libXNVCtrl-devel
-          nvidia-modprobe
-          nvidia-persistenced
-          nvidia-settings
-          nvidia-xconfig
-        ).each do |pkg|
-          it do
-            expect(chef_run).to_not add_yum_version_lock(pkg)
-          end
-        end
-
-        it do
-          expect(chef_run).to_not install_package(%w(nvidia-driver-latest-dkms cuda-drivers nvidia-docker2))
-        end
       end
     end
   end

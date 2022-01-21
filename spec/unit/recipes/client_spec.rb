@@ -50,20 +50,6 @@ describe 'osl-docker::client' do
             release: '3.el7'
           )
         end
-      when DEBIAN_10
-        it do
-          expect(chef_run).to remove_apt_preference('docker-ce').with(
-            pin: 'version 5:18.09.2~3-0~debian-buster',
-            pin_priority: '1001'
-          )
-        end
-
-        it do
-          expect(chef_run).to remove_apt_preference('docker-ce-cli').with(
-            pin: 'version 5:18.09.2~3-0~debian-buster',
-            pin_priority: '1001'
-          )
-        end
       end
     end
   end

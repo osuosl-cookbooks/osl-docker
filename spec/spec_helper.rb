@@ -11,16 +11,15 @@ CENTOS_7 = {
   version: '7',
 }.freeze
 
-DEBIAN_10 = {
-  platform: 'debian',
-  version: '10',
-}.freeze
-
 ALL_PLATFORMS = [
   CENTOS_8,
   CENTOS_7,
-  DEBIAN_10,
 ].freeze
+
+DEBIAN_11 = {
+  platform: 'debian',
+  version: '11',
+}.freeze
 
 CENTOS_PLATFORMS = [
   CENTOS_8,
@@ -28,7 +27,7 @@ CENTOS_PLATFORMS = [
 ].freeze
 
 DEBIAN_PLATFORMS = [
-  DEBIAN_10,
+  DEBIAN_11,
 ].freeze
 
 RSpec.configure do |config|

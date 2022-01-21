@@ -14,7 +14,7 @@ describe 'osl-docker::ibmz_ci' do
       end
       it do
         expect(chef_run).to create_docker_service('default').with(
-          host: ['unix:///var/run/docker.sock', 'tcp://0.0.0.0:2376']
+          host: ['unix:///var/run/docker.sock', 'tcp://0.0.0.0:2375']
         )
       end
       it do
