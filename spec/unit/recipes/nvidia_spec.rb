@@ -173,7 +173,7 @@ describe 'osl-docker::nvidia' do
             expect(chef_run.notify_group('notify yum makecache cuda')).to notify('yum_repository[cuda]').immediately
           end
         end
-      when DEBIAN_10
+      when DEBIAN_11
         %w(
           yum-epel
           yum-nvidia
