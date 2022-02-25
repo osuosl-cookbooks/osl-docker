@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.4.0 (2022-02-25)
+------------------
+- removed debian 10 support
+
 4.3.2 (2022-01-19)
 ------------------
 - Remove unused configuration on POWER-CI and IBMZ-CI
