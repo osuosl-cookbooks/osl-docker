@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.5.0 (2022-08-23)
+------------------
+- Replace base with osl-resources
+
 4.4.0 (2022-02-25)
 ------------------
 - removed debian 10 support
