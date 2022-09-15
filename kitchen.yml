@@ -42,7 +42,6 @@ suites:
     run_list:
       - recipe[osl-docker::nvidia]
     excludes:
-      - centos_stream-8 # TODO: Add back after we upgrade to version 440 or later
       - debian-11
   - name: powerci
     run_list:
