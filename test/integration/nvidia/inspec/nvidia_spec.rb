@@ -1,20 +1,17 @@
-# Inspec test for recipe osl-docker::nvidia
+os_release = os.release.to_i
 
-# The Inspec reference, with examples and extensive documentation, can be
-# found at http://inspec.io/docs/reference/resources/
-
-describe package('nvidia-driver-latest-dkms') do
-  it { should be_installed }
-  its('version') { should eq '440.33.01-1.el7' }
+if os_release >= 8
+  describe package('nvidia-driver') do
+    it { should be_installed }
+  end
+else
+  describe package('nvidia-driver-latest-dkms') do
+    it { should be_installed }
+  end
 end
 
 describe package('nvidia-docker2') do
   it { should be_installed }
-end
-
-describe package('cuda-drivers') do
-  it { should be_installed }
-  its('version') { should eq '440.33.01-1' }
 end
 
 describe docker.info do
