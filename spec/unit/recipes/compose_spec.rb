@@ -1,6 +1,6 @@
 require_relative '../../spec_helper'
 
-version = '2.15.0'
+version = 'v2.15.0'
 
 describe 'osl-docker::compose' do
   ALL_PLATFORMS.each do |p|

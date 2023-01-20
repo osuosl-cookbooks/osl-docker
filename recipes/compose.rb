@@ -20,7 +20,7 @@ include_recipe 'osl-selinux' if platform_family?('rhel')
 compose = node['osl-docker']['compose']
 
 remote_file '/usr/local/bin/docker-compose' do
-  source "#{compose['url_base']}/#{compose['version']}/#{compose['filename']}"
+  source "#{compose['url_base']}/v#{compose['version']}/#{compose['filename']}"
   checksum compose['checksum']
   mode '0755'
 end
