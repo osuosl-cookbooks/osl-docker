@@ -37,6 +37,8 @@ suites:
   - name: compose
     run_list:
       - recipe[osl-docker::compose]
+    driver:
+      flavor_ref: 'm1.large'
   - name: nvidia
     verifier: inspec
     run_list:
