@@ -2,7 +2,7 @@
 # Cookbook:: osl-docker
 # Recipe:: compose
 #
-# Copyright:: 2018-2022, Oregon State University
+# Copyright:: 2018-2023, Oregon State University
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ include_recipe 'osl-selinux' if platform_family?('rhel')
 compose = node['osl-docker']['compose']
 
 remote_file '/usr/local/bin/docker-compose' do
-  source "#{compose['url_base']}/#{compose['version']}/#{compose['filename']}"
+  source "#{compose['url_base']}/v#{compose['version']}/#{compose['filename']}"
   checksum compose['checksum']
   mode '0755'
 end
