@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.7.0 (2023-01-25)
+------------------
+- Upgrade docker-compose to 2.15
+
 4.6.0 (2022-09-23)
 ------------------
 - Switch to using osl-gpu cookbook for nvidia recipe
