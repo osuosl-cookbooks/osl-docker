@@ -1,7 +1,7 @@
 require_relative '../../spec_helper'
 
 describe 'osl-docker::nvidia' do
-  CENTOS_PLATFORMS.each do |p|
+  RHEL_PLATFORMS.each do |p|
     context "#{p[:platform]} #{p[:version]}" do
       cached(:chef_run) do
         ChefSpec::SoloRunner.new(p).converge(described_recipe)
@@ -43,12 +43,7 @@ describe 'osl-docker::nvidia' do
           )
       end
 
-      case p
-      when CENTOS_7
-        it { is_expected.to create_selinux_module('nvidia_docker') }
-      when CENTOS_8
-        it { is_expected.to_not create_selinux_module('nvidia_docker') }
-      end
+      it { is_expected.to create_selinux_module('nvidia_docker') }
     end
   end
 end

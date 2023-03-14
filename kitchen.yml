@@ -13,13 +13,20 @@ provisioner:
     osl-selinux:
       enforcing: true
 
-verifier: inspec
+verifier:
+  name: inspec
+  inspec_tests:
+    - path: test/integration/inspec
 
 suites:
   - name: default
     run_list:
       - recipe[docker_test]
       - recipe[osl-docker::default]
+    verifier:
+      controls:
+        - default
+        - selinux
   - name: default_tls
     run_list:
       - recipe[docker_test]
@@ -31,25 +38,50 @@ suites:
       server_name: default_tls
     provisioner:
       multiple_converge: 3
+    verifier:
+      controls:
+        - default
+        - selinux
+      inputs:
+        tls: true
+        docker_env: 'DOCKER_HOST="tcp://127.0.0.1:2376" DOCKER_CERT_PATH="/etc/docker/ssl" DOCKER_TLS_VERIFY="1"'
   - name: client
     run_list:
       - recipe[osl-docker::client]
+    verifier:
+      controls:
+        - default
+        - selinux
+      inputs:
+        client_only: true
   - name: compose
     run_list:
       - recipe[osl-docker::compose]
-    driver:
-      flavor_ref: 'm1.large'
+    verifier:
+      controls:
+        - compose
+        - selinux
   - name: nvidia
-    verifier: inspec
     run_list:
       - recipe[osl-docker::nvidia]
     excludes:
       - debian-11
+    verifier:
+      controls:
+        - nvidia
+        - selinux
   - name: powerci
     run_list:
       - recipe[osl-docker::powerci]
     excludes:
       - debian-11
+    verifier:
+      controls:
+        - default
+        - powerci
+        - selinux
+      inputs:
+        docker_env: 'DOCKER_HOST="tcp://0.0.0.0:2375"'
   - name: ibmz_ci
     run_list:
       - recipe[osl-docker::ibmz_ci]
@@ -59,9 +91,24 @@ suites:
       multiple_converge: 3
     excludes:
       - debian-11
+    verifier:
+      controls:
+        - default
+        - ibmz-ci
+        - selinux
+      inputs:
+        docker_env: 'DOCKER_HOST="tcp://0.0.0.0:2375"'
   - name: workstation
     run_list:
       - recipe[osl-docker::workstation]
     excludes:
+      - almalinux-8
       - centos-7
       - centos_stream-8
+    verifier:
+      controls:
+        - default
+        - workstation
+        - selinux
+      inputs:
+        docker_env: 'DOCKER_HOST="tcp://0.0.0.0:2375"'

@@ -50,5 +50,4 @@ selinux_module 'nvidia_docker' do
     #============= xserver_t ==============
     allow xserver_t container_runtime_exec_t:file entrypoint;
   EOM
-  only_if { node['platform_version'].to_i < 8 }
 end

@@ -1,0 +1,8 @@
+name: osl-docker
+inputs:
+  - name: docker_env
+    value: ''
+  - name: tls
+    value: false
+  - name: client_only
+    value: false

@@ -15,40 +15,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-case node['platform_family']
-when 'rhel'
-  include_recipe 'osl-selinux'
-
-  # TODO: Remove the yum-plugin-versionlock after this has been run on the nodes
-  include_recipe 'yum-plugin-versionlock'
-
-  yum_version_lock osl_docker_package_name do
-    version osl_docker_version
-    release osl_docker_release
-    epoch 3
-    action :remove
-  end
-
-  yum_version_lock osl_docker_cli_package_name do
-    version osl_docker_version
-    release osl_docker_release
-    epoch 1
-    action :remove
-  end
-when 'debian'
-  # TODO: Remove apt pinning after this has been run on the nodes
-  apt_preference osl_docker_package_name do
-    pin "version #{osl_docker_package_version_string}"
-    pin_priority '1001'
-    action :remove
-  end
-
-  apt_preference osl_docker_cli_package_name do
-    pin "version #{osl_docker_package_version_string}"
-    pin_priority '1001'
-    action :remove
-  end
-end
+include_recipe 'osl-selinux' if platform_family?('rhel')
 
 osl_firewall_docker 'osl-docker'
 
