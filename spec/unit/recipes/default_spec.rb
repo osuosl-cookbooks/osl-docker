@@ -84,38 +84,9 @@ describe 'osl-docker::default' do
       end
 
       case p
-      when CENTOS_7, CENTOS_8
+      when RHEL_PLATFORMS
         it do
           expect(chef_run).to include_recipe('osl-selinux')
-        end
-
-        it { expect(chef_run).to include_recipe('yum-plugin-versionlock') }
-
-        it do
-          expect(chef_run).to remove_yum_version_lock('docker-ce').with(
-            version: '18.09.2',
-            release: '3.el7'
-          )
-        end
-        it do
-          expect(chef_run).to remove_yum_version_lock('docker-ce-cli').with(
-            version: '18.09.2',
-            release: '3.el7'
-          )
-        end
-      when DEBIAN_11
-        it do
-          expect(chef_run).to remove_apt_preference('docker-ce').with(
-            pin: 'version 5:18.09.2~3-0~debian-bullseye',
-            pin_priority: '1001'
-          )
-        end
-
-        it do
-          expect(chef_run).to remove_apt_preference('docker-ce-cli').with(
-            pin: 'version 5:18.09.2~3-0~debian-bullseye',
-            pin_priority: '1001'
-          )
         end
       end
 
