@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.8.0 (2023-03-15)
+------------------
+- Add AlmaLinux 8 support
+
 4.7.0 (2023-01-25)
 ------------------
 - Upgrade docker-compose to 2.15
