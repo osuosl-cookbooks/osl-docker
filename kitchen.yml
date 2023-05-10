@@ -104,7 +104,6 @@ suites:
     excludes:
       - almalinux-8
       - centos-7
-      - centos_stream-8
     verifier:
       controls:
         - default

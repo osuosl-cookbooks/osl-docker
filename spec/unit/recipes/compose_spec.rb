@@ -57,7 +57,7 @@ describe 'osl-docker::compose' do
               )
           end
         end
-      when ALMA_8, CENTOS_8
+      when ALMA_8
         it do
           expect(chef_run).to include_recipe 'osl-selinux'
         end
