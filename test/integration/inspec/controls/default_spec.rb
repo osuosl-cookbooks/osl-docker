@@ -21,7 +21,7 @@ control 'default' do
 
   %w(docker dockerd).each do |cmd|
     describe command "#{cmd} --version" do
-      its('stdout') { should match(/23.0/) }
+      its('stdout') { should match(/24.0/) }
     end
   end
 
