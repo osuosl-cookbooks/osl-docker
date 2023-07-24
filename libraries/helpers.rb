@@ -35,6 +35,20 @@ module OslDocker
         # only use standard repo on Deb / C7 -- standard repo not available for C8
         platform_family?('debian') || (platform_family?('rhel') && node['platform_version'].to_i == 7)
       end
+
+      def osl_dockercompose_running?
+        cmd = shell_out(
+          'docker compose ls -q',
+          cwd: new_resource.directory
+        )
+
+        if cmd.exitstatus != 0
+          Chef::Log.fatal('Failed executing: docker compose ls -q')
+          Chef::Log.fatal(cmd.stderr)
+        else
+          cmd.stdout.chomp == new_resource.name
+        end
+      end
     end
   end
 end
