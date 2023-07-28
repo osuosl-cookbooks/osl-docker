@@ -62,6 +62,10 @@ control 'default' do
       its(%w(log-opts max-file)) { should cmp '10' }
     end
 
+    describe package('cron' || 'crond') do
+      it { should be_installed }
+    end
+
     describe crontab.where { command =~ /docker system prune --volumes/ } do
       its('minutes') { should cmp '15' }
       its('hours') { should cmp '*' }
