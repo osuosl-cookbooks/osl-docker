@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.10.0 (2023-07-24)
+-------------------
+- Create osl_dockercompose resource
+
 4.9.0 (2023-06-13)
 ------------------
 - Bump to docker 11.1.0

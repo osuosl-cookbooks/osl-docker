@@ -1,0 +1,6 @@
+version: "2.4"
+
+services:
+  hello_world:
+    image: alpine
+    command: [/bin/sleep, '1d']

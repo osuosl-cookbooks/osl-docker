@@ -45,6 +45,14 @@ suites:
       inputs:
         tls: true
         docker_env: 'DOCKER_HOST="tcp://127.0.0.1:2376" DOCKER_CERT_PATH="/etc/docker/ssl" DOCKER_TLS_VERIFY="1"'
+  - name: osl_dockercompose
+    run_list:
+      - recipe[docker_test::compose]
+    verifier:
+      controls:
+        - default
+        - selinux
+        - osl_dockercompose
   - name: client
     run_list:
       - recipe[osl-docker::client]
