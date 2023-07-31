@@ -83,6 +83,8 @@ describe 'osl-docker::default' do
         )
       end
 
+      it { expect(chef_run).to install_cron_package('osl-docker') }
+
       case p
       when RHEL_PLATFORMS
         it do
