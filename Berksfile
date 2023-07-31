@@ -2,7 +2,6 @@ source 'https://supermarket.chef.io'
 
 solver :ruby, :required
 
-cookbook 'cron', git: 'git@github.com:sous-chefs/cron', branch: 'main'
 cookbook 'osl-firewall', git: 'git@github.com:osuosl-cookbooks/osl-firewall'
 cookbook 'osl-gpu', git: 'git@github.com:osuosl-cookbooks/osl-gpu', branch: 'main'
 cookbook 'osl-repos', git: 'git@github.com:osuosl-cookbooks/osl-repos'
