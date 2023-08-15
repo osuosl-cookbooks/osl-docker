@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.11.0 (2023-08-15)
+-------------------
+- Add Debian 12 support
+
 4.10.0 (2023-07-24)
 -------------------
 - Create osl_dockercompose resource
