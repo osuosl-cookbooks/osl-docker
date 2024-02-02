@@ -18,7 +18,7 @@ end
 
 action :rebuild do
   execute "#{new_resource.name} rebuild" do
-    command "docker compose -p #{new_resource.name} #{new_resource.config.map { |f| "-f #{f}" }.join(' ')} up --pull --build -d"
+    command "docker compose -p #{new_resource.name} #{new_resource.config.map { |f| "-f #{f}" }.join(' ')} up --pull always --build -d"
     cwd new_resource.directory
     live_stream true
   end

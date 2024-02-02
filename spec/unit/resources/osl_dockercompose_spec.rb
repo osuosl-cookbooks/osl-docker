@@ -32,7 +32,7 @@ describe 'osl_dockercompose' do
 
   it do
     is_expected.to run_execute('test-configs rebuild').with(
-      command: 'docker compose -p test-configs -f docker-compose.yml -f docker-compose-common.yml up --pull --build -d',
+      command: 'docker compose -p test-configs -f docker-compose.yml -f docker-compose-common.yml up --pull always --build -d',
       cwd: '/var/lib/test-configs',
       live_stream: true
     )
