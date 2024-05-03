@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.11.2 (2024-05-03)
+-------------------
+- Remove support for Debian 11
+
 4.11.1 (2024-02-02)
 -------------------
 - Fix new docker compose CLI syntax
