@@ -137,3 +137,14 @@ cron 'docker_prune_images' do
   command "/usr/bin/docker system prune -a -f #{volume_filter.join(' ')} > /dev/null"
   not_if { node['osl-docker']['client_only'] }
 end
+
+# In the event the node is utilizing iptables, sync docker to restart when iptables restarts.
+# Docker automatically adds extra rules to iptables, but these changes are not saved on reloads.
+osl_systemd_unit_drop_in 'iptables-fix' do
+  unit_name 'docker.service'
+  content({
+    'Unit' => {
+      'PartOf' => 'iptables.service',
+    },
+  })
+end
