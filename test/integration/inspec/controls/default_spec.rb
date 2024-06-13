@@ -19,9 +19,14 @@ control 'default' do
     end
   end
 
+  describe file '/etc/systemd/system/docker.service.d/iptables-fix.conf' do
+    it { should exist }
+    its('content') { should match 'PartOf = iptables.service' }
+  end
+
   %w(docker dockerd).each do |cmd|
     describe command "#{cmd} --version" do
-      its('stdout') { should match(/25.0/) }
+      its('stdout') { should match(/26.1/) }
     end
   end
 

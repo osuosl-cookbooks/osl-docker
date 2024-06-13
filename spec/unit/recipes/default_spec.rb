@@ -186,6 +186,17 @@ describe 'osl-docker::default' do
             tls_client_key: '/etc/docker/ssl/key.pem'
           )
         end
+
+        it do
+          expect(chef_run).to create_osl_systemd_unit_drop_in('iptables-fix').with(
+            unit_name: 'docker.service',
+            content: {
+              'Unit' => {
+                'PartOf' => 'iptables.service',
+              },
+            }
+          )
+        end
       end
     end
   end
