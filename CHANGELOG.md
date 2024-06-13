@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.12.0 (2024-06-13)
+-------------------
+- Slightly modify Docker's systemd unit to restart when iptables restarts
+
 4.11.2 (2024-05-03)
 -------------------
 - Remove support for Debian 11
