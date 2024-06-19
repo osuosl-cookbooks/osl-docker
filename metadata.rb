@@ -17,6 +17,7 @@ depends          'osl-gpu'
 depends          'osl-resources'
 depends          'osl-selinux'
 
+supports         'almalinux', '~> 9.0'
 supports         'almalinux', '~> 8.0'
 supports         'debian', '~> 12.0'
 supports         'ubuntu', '~> 24.04'

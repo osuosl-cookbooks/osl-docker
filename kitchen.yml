@@ -119,6 +119,7 @@ suites:
     run_list:
       - recipe[osl-docker::workstation]
     excludes:
+      - almalinux-9
       - almalinux-8
       - ubuntu-24.04
     verifier:
