@@ -26,7 +26,11 @@ control 'default' do
 
   %w(docker dockerd).each do |cmd|
     describe command "#{cmd} --version" do
+<<<<<<< HEAD
       its('stdout') { should match(/26.1/) }
+=======
+      its('stdout') { should match(/26\./) }
+>>>>>>> fc70022 (Added almalinux 9)
     end
   end
 
