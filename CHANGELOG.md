@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.12.2 (2024-07-08)
+-------------------
+- Update to latest docker cookbook to fix excon issues
+
 4.12.1 (2024-06-24)
 -------------------
 - Move ghcr_io_credentials library helper from osl-app
