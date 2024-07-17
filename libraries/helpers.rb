@@ -32,8 +32,8 @@ module OslDocker
         # standard repo not available for PowerLE or s390x
         return false if %w(ppc64le s390x).include? node['kernel']['machine']
 
-        # only use standard repo on Deb / C7 -- standard repo not available for C8
-        platform_family?('debian') || (platform_family?('rhel') && node['platform_version'].to_i == 7)
+        # only use standard repo on Debian -- standard repo not available for C8
+        platform_family?('debian')
       end
 
       def osl_dockercompose_running?

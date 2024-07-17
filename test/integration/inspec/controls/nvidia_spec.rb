@@ -1,14 +1,6 @@
-os_release = os.release.to_i
-
 control 'nvidia' do
-  if os_release >= 8
-    describe package('nvidia-driver') do
-      it { should be_installed }
-    end
-  else
-    describe package('nvidia-driver-latest-dkms') do
-      it { should be_installed }
-    end
+  describe package('nvidia-driver') do
+    it { should be_installed }
   end
 
   describe package('nvidia-docker2') do

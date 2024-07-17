@@ -62,13 +62,6 @@ suites:
         - selinux
       inputs:
         client_only: true
-  - name: compose
-    run_list:
-      - recipe[osl-docker::compose]
-    verifier:
-      controls:
-        - compose
-        - selinux
   - name: nvidia
     run_list:
       - recipe[osl-docker::nvidia]
@@ -111,7 +104,6 @@ suites:
       - recipe[osl-docker::workstation]
     excludes:
       - almalinux-8
-      - centos-7
     verifier:
       controls:
         - default
