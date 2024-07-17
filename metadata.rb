@@ -18,5 +18,4 @@ depends          'osl-resources'
 depends          'osl-selinux'
 
 supports         'almalinux', '~> 8.0'
-supports         'centos', '~> 7.0'
 supports         'debian', '~> 12.0'

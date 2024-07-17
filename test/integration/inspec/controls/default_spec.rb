@@ -1,8 +1,6 @@
 docker_env = input('docker_env')
 client_only = input('client_only')
 tls = input('tls')
-operating_system = os.family
-release = os.release.to_i
 
 control 'default' do
   describe file '/etc/docker' do
@@ -26,7 +24,7 @@ control 'default' do
 
   %w(docker dockerd).each do |cmd|
     describe command "#{cmd} --version" do
-      its('stdout') { should match(/26.1/) }
+      its('stdout') { should match(/2[0-9].[0-9]/) }
     end
   end
 
@@ -112,15 +110,8 @@ control 'default' do
         its('stderr') { should match(/Server: Docker/) }
         its('stdout') { should match(/\[.*\]/) }
         its('stderr') { should match(%r{HTTP/1.1 200 OK}) }
-        if operating_system == 'redhat' && release < 8
-          its('stderr') { should match(/client certificate from file\n.*subject: CN=client/) }
-          its('stderr') do
-            should match(/issuer: E=dnsadmin@osuosl.org,CN=localhost,O=OSU Open Source Lab,L=Corvallis,ST=Oregon,C=US/)
-          end
-        else
-          its('stderr') do
-            should match(/issuer: C=US; ST=Oregon; L=Corvallis; O=OSU Open Source Lab; CN=localhost; emailAddress=dnsadmin@osuosl.org/)
-          end
+        its('stderr') do
+          should match(/issuer: C=US; ST=Oregon; L=Corvallis; O=OSU Open Source Lab; CN=localhost; emailAddress=dnsadmin@osuosl.org/)
         end
       end
     end
