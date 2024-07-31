@@ -19,3 +19,4 @@ depends          'osl-selinux'
 
 supports         'almalinux', '~> 8.0'
 supports         'debian', '~> 12.0'
+supports         'ubuntu', '~> 24.04'
