@@ -37,6 +37,9 @@ docker_service 'default' do
   node['osl-docker']['service'].each do |key, value|
     send(key.to_sym, value)
   end
+  setup_docker_repo osl_docker_setup_repo?
+  package_name osl_docker_package_name
+  service_manager osl_docker_service_manager
   if node['osl-docker']['tls'] && ::File.exist?('/etc/docker/ssl/key.pem')
     tls_verify true
     tls_ca_cert '/etc/docker/ssl/ca.pem'
@@ -148,3 +151,12 @@ osl_systemd_unit_drop_in 'iptables-fix' do
     },
   })
 end
+
+osl_systemd_unit_drop_in 'misc-opts' do
+  unit_name 'docker.service'
+  content <<~EOC
+    [Service]
+    ExecStart=
+    ExecStart=#{osl_dockerd_path} -H fd:// --containerd=/run/containerd/containerd.sock #{node['osl-docker']['service']['misc_opts']}
+  EOC
+end unless osl_docker_setup_repo?

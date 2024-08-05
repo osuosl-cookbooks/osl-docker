@@ -1,7 +1,7 @@
 require_relative '../../spec_helper'
 
 describe 'osl-docker::workstation' do
-  DEBIAN_PLATFORMS.each do |p|
+  ALL_DEBIAN.each do |p|
     context "#{p[:platform]} #{p[:version]}" do
       cached(:chef_run) do
         ChefSpec::SoloRunner.new(p).converge(described_recipe)

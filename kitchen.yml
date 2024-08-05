@@ -27,6 +27,19 @@ suites:
       controls:
         - default
         - selinux
+  - name: default_setup_repo
+    run_list:
+      - recipe[docker_test]
+      - recipe[osl-docker::default]
+    verifier:
+      controls:
+        - default
+        - selinux
+    attributes:
+      osl-docker:
+        setup_repo: false
+    excludes:
+      - almalinux-8
   - name: default_tls
     run_list:
       - recipe[docker_test]

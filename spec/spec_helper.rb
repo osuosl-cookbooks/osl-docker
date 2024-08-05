@@ -22,11 +22,11 @@ ALL_PLATFORMS = [
   UBUNTU_2404,
 ].freeze
 
-RHEL_PLATFORMS = [
+ALL_RHEL = [
   ALMA_8,
 ].freeze
 
-DEBIAN_PLATFORMS = [
+ALL_DEBIAN = [
   DEBIAN_12,
   UBUNTU_2404,
 ].freeze
