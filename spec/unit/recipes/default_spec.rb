@@ -47,9 +47,46 @@ describe 'osl-docker::default' do
 
       it do
         expect(chef_run).to create_docker_service('default').with(
+          setup_docker_repo: true,
+          package_name: 'docker-ce',
+          service_manager: 'auto',
           host: %w(unix:///var/run/docker.sock),
           misc_opts: '--live-restore'
         )
+      end
+
+      context 'riscv64' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p) do |node|
+            node.automatic['kernel']['machine'] = 'riscv64'
+          end.converge(described_recipe)
+        end
+        dockerd_path =
+          if p[:platform] == 'debian'
+            '/usr/sbin/dockerd'
+          else
+            '/usr/bin/dockerd'
+          end
+
+        it do
+          expect(chef_run).to create_docker_service('default').with(
+            setup_docker_repo: false,
+            package_name: 'docker.io',
+            service_manager: 'none',
+            host: %w(unix:///var/run/docker.sock),
+            misc_opts: '--live-restore'
+          )
+        end
+        it do
+          expect(chef_run).to create_osl_systemd_unit_drop_in('misc-opts').with(
+            unit_name: 'docker.service',
+            content: <<~EOC
+              [Service]
+              ExecStart=
+              ExecStart=#{dockerd_path} -H fd:// --containerd=/run/containerd/containerd.sock --live-restore
+            EOC
+          )
+        end
       end
 
       it do
@@ -88,7 +125,7 @@ describe 'osl-docker::default' do
       it { expect(chef_run).to start_cron_service('osl-docker') }
 
       case p
-      when RHEL_PLATFORMS
+      when *ALL_RHEL
         it do
           expect(chef_run).to include_recipe('osl-selinux')
         end

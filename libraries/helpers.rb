@@ -1,39 +1,29 @@
 module OslDocker
   module Cookbook
     module Helpers
-      def osl_docker_version
-        '18.09.2'
-      end
-
-      def osl_docker_release
-        '3.el7'
-      end
-
       def osl_docker_package_name
-        'docker-ce'
+        if osl_docker_setup_repo?
+          'docker-ce'
+        else
+          'docker.io'
+        end
       end
 
-      def osl_docker_cli_package_name
-        'docker-ce-cli'
-      end
-
-      def osl_docker_package_version_string
-        case node['platform_family']
-        when 'rhel'
-          "3:#{osl_docker_version}-#{osl_docker_release}"
-        when 'debian'
-          "5:#{osl_docker_version}~3-0~debian-#{node['lsb']['codename']}"
+      def osl_docker_service_manager
+        if osl_docker_setup_repo?
+          'auto'
+        else
+          'none'
         end
       end
 
       def osl_docker_setup_repo?
         # have the docker resource setup the docker repos?
-
-        # standard repo not available for PowerLE or s390x
-        return false if %w(ppc64le s390x).include? node['kernel']['machine']
-
-        # only use standard repo on Debian -- standard repo not available for C8
-        platform_family?('debian')
+        if %w(riscv64).include? node['kernel']['machine']
+          false
+        else
+          node['osl-docker']['setup_repo']
+        end
       end
 
       def osl_dockercompose_running?
@@ -47,6 +37,14 @@ module OslDocker
           Chef::Log.fatal(cmd.stderr)
         else
           cmd.stdout.chomp == new_resource.name
+        end
+      end
+
+      def osl_dockerd_path
+        if platform?('debian')
+          '/usr/sbin/dockerd'
+        else
+          '/usr/bin/dockerd'
         end
       end
 
