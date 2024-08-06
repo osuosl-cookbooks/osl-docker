@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.14.0 (2024-08-06)
+-------------------
+- Add support for riscv64
+
 4.13.1 (2024-07-31)
 -------------------
 - Add support for Ubuntu
