@@ -40,6 +40,7 @@ suites:
         setup_repo: false
     excludes:
       - almalinux-8
+      - almalinux-9
   - name: default_tls
     run_list:
       - recipe[docker_test]
