@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.14.1 (2024-08-26)
+-------------------
+- Add support for AlmaLinux 9
+
 4.14.0 (2024-08-06)
 -------------------
 - Add support for riscv64
