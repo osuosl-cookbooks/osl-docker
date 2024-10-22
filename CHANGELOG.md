@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.14.2 (2024-10-22)
+-------------------
+- Remove deprecated `version` parameter from docker_compose.yml
+
 4.14.1 (2024-08-26)
 -------------------
 - Add support for AlmaLinux 9
