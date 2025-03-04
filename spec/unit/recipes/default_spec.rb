@@ -33,6 +33,7 @@ describe 'osl-docker::default' do
                 'max-size' => '100m',
                 'max-file' => '10',
               },
+              'registry-mirrors' => %w(https://registry.osuosl.org),
             },
           }
         )
