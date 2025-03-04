@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.14.3 (2025-03-04)
+-------------------
+- Set our internal registry mirror by default
+
 4.14.2 (2024-10-22)
 -------------------
 - Remove deprecated `version` parameter from docker_compose.yml
