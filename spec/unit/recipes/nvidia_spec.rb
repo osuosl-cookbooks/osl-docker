@@ -32,6 +32,7 @@ describe 'osl-docker::nvidia' do
                   'max-size' => '100m',
                   'max-file' => '10',
                 },
+                'registry-mirrors' => %w(https://registry.osuosl.org),
                 'runtimes' => {
                   'nvidia' => {
                     'path' => 'nvidia-container-runtime',

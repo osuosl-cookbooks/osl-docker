@@ -56,11 +56,13 @@ control 'default' do
   else
     describe docker.info do
       its('LiveRestoreEnabled') { should eq true }
+      its(%w(RegistryConfig Mirrors)) { should eq %w(https://registry.osuosl.org/) }
     end
 
     describe json '/etc/docker/daemon.json' do
       its('metrics-addr') { should cmp '0.0.0.0:9323' }
       its('experimental') { should cmp 'true' }
+      its('registry-mirrors') { should cmp %w(https://registry.osuosl.org) }
       its(%w(log-opts max-size)) { should cmp '100m' }
       its(%w(log-opts max-file)) { should cmp '10' }
     end

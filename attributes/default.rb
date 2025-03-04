@@ -8,6 +8,7 @@ default['osl-docker']['daemon'] =
       'max-size' => '100m',
       'max-file' => '10',
     },
+    'registry-mirrors' => %w(https://registry.osuosl.org),
   }
 default['osl-docker']['prune']['volume_filter'] = []
 default['osl-docker']['tls'] = false
