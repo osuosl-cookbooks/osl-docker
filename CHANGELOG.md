@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.15.0 (2025-07-29)
+-------------------
+- Remove cron cookbook dependency
+
 4.14.3 (2025-03-04)
 -------------------
 - Set our internal registry mirror by default
