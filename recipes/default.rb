@@ -24,11 +24,6 @@ osl_firewall_port 'docker_exporter' do
   ports %w(9323)
 end
 
-cron_package 'osl-docker'
-cron_service 'osl-docker' do
-  action [:enable, :start]
-end
-
 node.default['osl-docker']['service']['misc_opts'] = '--live-restore'
 node.default['osl-docker']['service']['host'] = ['unix:///var/run/docker.sock']
 node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'].nil?
