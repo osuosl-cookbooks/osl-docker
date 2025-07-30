@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.16.0 (2025-07-30)
+-------------------
+- Rename config property to config_files in osl_dockercompose
+
 4.15.0 (2025-07-29)
 -------------------
 - Remove cron cookbook dependency
