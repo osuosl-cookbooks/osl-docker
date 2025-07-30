@@ -36,7 +36,7 @@ module OslDocker
           Chef::Log.fatal('Failed executing: docker compose ls -q')
           Chef::Log.fatal(cmd.stderr)
         else
-          cmd.stdout.chomp == new_resource.name
+          cmd.stdout.split(/\r?\n/).any? { |n| n.chomp == new_resource.name }
         end
       end
 

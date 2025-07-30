@@ -17,7 +17,7 @@ describe 'osl_dockercompose' do
 
     osl_dockercompose 'test-configs' do
       directory '/var/lib/test-configs'
-      config %w(docker-compose.yml docker-compose-common.yml)
+      config_files %w(docker-compose.yml docker-compose-common.yml)
       action [:rebuild, :restart]
     end
   end

@@ -1,0 +1,5 @@
+services:
+  hello_world2:
+    image: alpine
+    command: [/bin/sleep, '1d']
+    depends_on: [hello_world1]
