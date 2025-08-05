@@ -7,6 +7,8 @@ describe 'osl-docker::default' do
         ChefSpec::SoloRunner.new(p).converge(described_recipe)
       end
 
+      include_context 'common_stubs'
+
       it 'converges successfully' do
         expect { chef_run }.to_not raise_error
       end
@@ -86,6 +88,11 @@ describe 'osl-docker::default' do
               ExecStart=
               ExecStart=#{dockerd_path} -H fd:// --containerd=/run/containerd/containerd.sock --live-restore
             EOC
+          )
+        end
+        it do
+          is_expected.to run_execute('remove_docker_transient_input_reject').with(
+            command: 'iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited'
           )
         end
       end

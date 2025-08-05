@@ -41,3 +41,9 @@ RSpec.configure do |config|
   config.log_level = :warn
   config.file_cache_path = '/var/chef/cache'
 end
+
+shared_context 'common_stubs' do
+  before do
+    stub_command('iptables -C INPUT -j REJECT --reject-with icmp-host-prohibited 2>/dev/null').and_return(true)
+  end
+end

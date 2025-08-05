@@ -155,3 +155,12 @@ osl_systemd_unit_drop_in 'misc-opts' do
     ExecStart=#{osl_dockerd_path} -H fd:// --containerd=/run/containerd/containerd.sock #{node['osl-docker']['service']['misc_opts']}
   EOC
 end unless osl_docker_setup_repo?
+
+# This rule prevents docker apps from accessing anything on the host and gets fixed on the iptables restart. However
+# that doesn't happen until the end. So let's remove it by hand here.
+rule_to_remove = '-j REJECT --reject-with icmp-host-prohibited'
+
+execute 'remove_docker_transient_input_reject' do
+  command "iptables -D INPUT #{rule_to_remove}"
+  only_if "iptables -C INPUT #{rule_to_remove} 2>/dev/null"
+end
