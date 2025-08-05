@@ -6,9 +6,13 @@ describe 'osl-docker::ibmz_ci' do
       cached(:chef_run) do
         ChefSpec::SoloRunner.new(p).converge(described_recipe)
       end
+
+      include_context 'common_stubs'
+
       before do
         stub_command('docker volume inspect ccache').and_return(false)
       end
+
       it 'converges successfully' do
         expect { chef_run }.to_not raise_error
       end

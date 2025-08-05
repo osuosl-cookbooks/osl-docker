@@ -6,6 +6,9 @@ describe 'osl-docker::powerci' do
       cached(:chef_run) do
         ChefSpec::SoloRunner.new(p.dup.merge(step_into: %w(osl-docker::default))).converge(described_recipe)
       end
+
+      include_context 'common_stubs'
+
       before do
         stub_command('docker volume inspect ccache').and_return(false)
       end

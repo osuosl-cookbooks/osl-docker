@@ -44,6 +44,10 @@ control 'default' do
     end
   end
 
+  describe iptables do
+    it { should_not have_rule('-A INPUT -j REJECT --reject-with icmp-host-prohibited') }
+  end
+
   if client_only
     describe file '/etc/docker/daemon.json' do
       it { should_not exist }
