@@ -41,6 +41,7 @@ suites:
     excludes:
       - almalinux-8
       - almalinux-9
+      - almalinux-10
   - name: default_tls
     run_list:
       - recipe[docker_test]
@@ -120,6 +121,7 @@ suites:
     run_list:
       - recipe[osl-docker::workstation]
     excludes:
+      - almalinux-10
       - almalinux-9
       - almalinux-8
       - ubuntu-24.04
