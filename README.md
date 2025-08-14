@@ -6,6 +6,10 @@ package from Docker Inc. and starts the docker service.
 
 Requirements
 ------------
+#### Platforms
+- AlmaLinux 8, 9, 10
+- Debian 12
+- Ubuntu 24.04
 
 - Chef 12.18.x or higher
 
