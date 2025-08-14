@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.16.2 (2025-08-14)
+-------------------
+- AlmaLinux 10 support
+
 4.16.1 (2025-08-05)
 -------------------
 - Fix transient issues with first chef runs
