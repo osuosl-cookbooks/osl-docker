@@ -91,6 +91,16 @@ describe 'osl-docker::default' do
           )
         end
         it do
+          expect(chef_run).to create_osl_systemd_unit_drop_in('ldap').with(
+            unit_name: 'docker.service',
+            content: <<~EOC
+              [Unit]
+              After=
+              After=network-online.target docker.socket firewalld.service containerd.service sssd.service
+            EOC
+          )
+        end
+        it do
           is_expected.to run_execute('remove_docker_transient_input_reject').with(
             command: 'iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited'
           )

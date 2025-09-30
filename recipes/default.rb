@@ -156,6 +156,15 @@ osl_systemd_unit_drop_in 'misc-opts' do
   EOC
 end unless osl_docker_setup_repo?
 
+osl_systemd_unit_drop_in 'ldap' do
+  unit_name 'docker.service'
+  content <<~EOC
+    [Unit]
+    After=
+    After=network-online.target docker.socket firewalld.service containerd.service sssd.service
+  EOC
+end
+
 # This rule prevents docker apps from accessing anything on the host and gets fixed on the iptables restart. However
 # that doesn't happen until the end. So let's remove it by hand here.
 rule_to_remove = '-j REJECT --reject-with icmp-host-prohibited'
