@@ -1,6 +1,7 @@
 docker_env = input('docker_env')
 client_only = input('client_only')
 tls = input('tls')
+debian = os.family == 'debian'
 
 control 'default' do
   describe file '/etc/docker' do
@@ -17,9 +18,13 @@ control 'default' do
     end
   end
 
-  describe file '/etc/systemd/system/docker.service.d/iptables-fix.conf' do
-    it { should exist }
-    its('content') { should match 'PartOf = iptables.service' }
+  describe command 'systemctl show docker.service' do
+    if debian
+      its('stdout') { should match /^PartOf=netfilter-persistent.service$/ }
+    else
+      its('stdout') { should match /^PartOf=iptables.service$/ }
+    end
+    its('stdout') { should match /^After=.*sssd.service/ }
   end
 
   %w(docker dockerd).each do |cmd|

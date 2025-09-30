@@ -10,7 +10,7 @@ version          '4.16.2'
 
 depends          'apt'
 depends          'certificate'
-depends          'docker', '~> 11.5.0'
+depends          'docker', '~> 11.10.0'
 depends          'osl-firewall'
 depends          'osl-gpu'
 depends          'osl-resources'
