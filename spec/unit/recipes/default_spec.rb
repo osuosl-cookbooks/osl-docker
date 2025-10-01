@@ -120,6 +120,7 @@ describe 'osl-docker::default' do
 
         case p
         when ALMA_8
+          it { is_expected.to delete_osl_systemd_unit_drop_in 'misc-opts' }
           it do
             expect(chef_run).to create_docker_service('default').with(
               setup_docker_repo: false,
@@ -140,6 +141,7 @@ describe 'osl-docker::default' do
             )
           end
         when ALMA_9, ALMA_10
+          it { is_expected.to delete_osl_systemd_unit_drop_in 'misc-opts' }
           it do
             expect(chef_run).to create_docker_service('default').with(
               setup_docker_repo: false,
