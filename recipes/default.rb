@@ -28,6 +28,15 @@ node.default['osl-docker']['service']['misc_opts'] = '--live-restore'
 node.default['osl-docker']['service']['host'] = ['unix:///var/run/docker.sock']
 node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'].nil?
 
+yum_repository 'docker' do
+  baseurl 'https://ftp.osuosl.org/pub/osl/repos/yum/$releasever/docker-stable/$basearch'
+  gpgkey osl_gpg_key
+  description 'Docker Stable repository'
+  gpgcheck true
+  enabled true
+  only_if { %w(ppc64le).include?(node['kernel']['machine']) && rhel? }
+end
+
 docker_service 'default' do
   node['osl-docker']['service'].each do |key, value|
     send(key.to_sym, value)

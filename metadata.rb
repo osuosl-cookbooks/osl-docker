@@ -13,6 +13,7 @@ depends          'certificate'
 depends          'docker', '~> 11.10.0'
 depends          'osl-firewall'
 depends          'osl-gpu'
+depends          'osl-repos'
 depends          'osl-resources'
 depends          'osl-selinux'
 

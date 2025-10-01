@@ -19,7 +19,7 @@ module OslDocker
 
       def osl_docker_setup_repo?
         # have the docker resource setup the docker repos?
-        if %w(riscv64).include? node['kernel']['machine']
+        if %w(riscv64 ppc64le).include? node['kernel']['machine']
           false
         else
           node['osl-docker']['setup_repo']
