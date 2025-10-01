@@ -2,10 +2,10 @@ module OslDocker
   module Cookbook
     module Helpers
       def osl_docker_package_name
-        if osl_docker_setup_repo?
-          'docker-ce'
-        else
+        if !osl_docker_setup_repo? && debian?
           'docker.io'
+        else
+          'docker-ce'
         end
       end
 
