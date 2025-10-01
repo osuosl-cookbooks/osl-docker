@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.18.3 (2025-10-01)
+-------------------
+- Correctly fix what needs misc-opts and remove it otherwise
+
 4.18.2 (2025-10-01)
 -------------------
 - Only use misc-opts on debian without upstream repo
