@@ -163,7 +163,7 @@ osl_systemd_unit_drop_in 'misc-opts' do
     ExecStart=
     ExecStart=#{osl_dockerd_path} -H fd:// --containerd=/run/containerd/containerd.sock #{node['osl-docker']['service']['misc_opts']}
   EOC
-end unless osl_docker_setup_repo?
+end unless osl_docker_setup_repo? && !debian?
 
 osl_systemd_unit_drop_in 'ldap' do
   unit_name 'docker.service'
