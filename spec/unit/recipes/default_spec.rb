@@ -65,46 +65,49 @@ describe 'osl-docker::default' do
             node.automatic['kernel']['machine'] = 'riscv64'
           end.converge(described_recipe)
         end
-        dockerd_path =
-          if p[:platform] == 'debian'
-            '/usr/sbin/dockerd'
-          else
-            '/usr/bin/dockerd'
-          end
+        case p
+        when ALL_DEBIAN *
+          dockerd_path =
+            if p[:platform] == 'debian'
+              '/usr/sbin/dockerd'
+            else
+              '/usr/bin/dockerd'
+            end
 
-        it do
-          expect(chef_run).to create_docker_service('default').with(
-            setup_docker_repo: false,
-            package_name: 'docker.io',
-            service_manager: 'none',
-            host: %w(unix:///var/run/docker.sock),
-            misc_opts: '--live-restore'
-          )
-        end
-        it do
-          expect(chef_run).to create_osl_systemd_unit_drop_in('misc-opts').with(
-            unit_name: 'docker.service',
-            content: <<~EOC
-              [Service]
-              ExecStart=
-              ExecStart=#{dockerd_path} -H fd:// --containerd=/run/containerd/containerd.sock --live-restore
-            EOC
-          )
-        end
-        it do
-          expect(chef_run).to create_osl_systemd_unit_drop_in('ldap').with(
-            unit_name: 'docker.service',
-            content: <<~EOC
-              [Unit]
-              After=
-              After=network-online.target docker.socket firewalld.service containerd.service sssd.service
-            EOC
-          )
-        end
-        it do
-          is_expected.to run_execute('remove_docker_transient_input_reject').with(
-            command: 'iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited'
-          )
+          it do
+            expect(chef_run).to create_docker_service('default').with(
+              setup_docker_repo: false,
+              package_name: 'docker.io',
+              service_manager: 'none',
+              host: %w(unix:///var/run/docker.sock),
+              misc_opts: '--live-restore'
+            )
+          end
+          it do
+            expect(chef_run).to create_osl_systemd_unit_drop_in('misc-opts').with(
+              unit_name: 'docker.service',
+              content: <<~EOC
+                [Service]
+                ExecStart=
+                ExecStart=#{dockerd_path} -H fd:// --containerd=/run/containerd/containerd.sock --live-restore
+              EOC
+            )
+          end
+          it do
+            expect(chef_run).to create_osl_systemd_unit_drop_in('ldap').with(
+              unit_name: 'docker.service',
+              content: <<~EOC
+                [Unit]
+                After=
+                After=network-online.target docker.socket firewalld.service containerd.service sssd.service
+              EOC
+            )
+          end
+          it do
+            is_expected.to run_execute('remove_docker_transient_input_reject').with(
+              command: 'iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited'
+            )
+          end
         end
       end
 
@@ -115,18 +118,18 @@ describe 'osl-docker::default' do
           end.converge(described_recipe)
         end
 
-        it do
-          expect(chef_run).to create_docker_service('default').with(
-            setup_docker_repo: false,
-            package_name: 'docker.io',
-            service_manager: 'none',
-            host: %w(unix:///var/run/docker.sock),
-            misc_opts: '--live-restore'
-          )
-        end
-
         case p
         when ALMA_8
+          it do
+            expect(chef_run).to create_docker_service('default').with(
+              setup_docker_repo: false,
+              package_name: 'docker-ce',
+              service_manager: 'none',
+              host: %w(unix:///var/run/docker.sock),
+              misc_opts: '--live-restore'
+            )
+          end
+
           it do
             is_expected.to create_yum_repository('docker').with(
               baseurl: 'https://ftp.osuosl.org/pub/osl/repos/yum/$releasever/docker-stable/$basearch',
@@ -137,6 +140,16 @@ describe 'osl-docker::default' do
             )
           end
         when ALMA_9, ALMA_10
+          it do
+            expect(chef_run).to create_docker_service('default').with(
+              setup_docker_repo: false,
+              package_name: 'docker-ce',
+              service_manager: 'none',
+              host: %w(unix:///var/run/docker.sock),
+              misc_opts: '--live-restore'
+            )
+          end
+
           it do
             is_expected.to create_yum_repository('docker').with(
               baseurl: 'https://ftp.osuosl.org/pub/osl/repos/yum/$releasever/docker-stable/$basearch',
