@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.18.1 (2025-10-01)
+-------------------
+- Fix logic around package name
+
 4.18.0 (2025-10-01)
 -------------------
 - Use OSL docker repo on ppc64le
