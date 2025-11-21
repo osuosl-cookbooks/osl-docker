@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.18.4 (2025-11-21)
+-------------------
+- Fix osl_dockercompose_running? to check actual container states
+
 4.18.3 (2025-10-01)
 -------------------
 - Correctly fix what needs misc-opts and remove it otherwise
