@@ -6,7 +6,11 @@ describe 'osl_dockercompose' do
 
   before do
     stubs_for_resource('execute[test up]') do |resource|
-      allow(resource).to receive_shell_out('docker compose ls -q', { cwd: '/var/lib/test' })
+      # Stub for docker compose ps -a --format json (returns empty, so not running)
+      allow(resource).to receive_shell_out(
+        'docker compose -p test  ps -a --format json',
+        { cwd: '/var/lib/test' }
+      ).and_return(double(exitstatus: 0, stdout: ''))
     end
   end
 
