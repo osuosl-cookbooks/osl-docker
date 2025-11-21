@@ -27,17 +27,28 @@ module OslDocker
       end
 
       def osl_dockercompose_running?
+        # Check if all containers in the compose project are running
         cmd = shell_out(
-          'docker compose ls -q',
+          "docker compose -p #{new_resource.name} #{new_resource.config_files.map { |f| "-f #{f}" }.join(' ')} ps -a --format json",
           cwd: new_resource.directory
         )
 
         if cmd.exitstatus != 0
-          Chef::Log.fatal('Failed executing: docker compose ls -q')
-          Chef::Log.fatal(cmd.stderr)
-        else
-          cmd.stdout.split(/\r?\n/).any? { |n| n.chomp == new_resource.name }
+          # If the command fails, the project likely doesn't exist yet
+          Chef::Log.debug("docker compose ps failed for #{new_resource.name}, assuming not running")
+          return false
         end
+
+        # Parse JSON output - each line is a separate JSON object
+        containers = cmd.stdout.split(/\r?\n/).map(&:chomp).reject(&:empty?).map do |line|
+          JSON.parse(line)
+        end
+
+        # If no containers are defined or found, consider it as not running
+        return false if containers.empty?
+
+        # Check if all containers have State == "running"
+        containers.all? { |container| container['State'] == 'running' }
       end
 
       def osl_dockerd_path
