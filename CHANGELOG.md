@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.18.5 (2025-11-27)
+-------------------
+- Add --wait flag to docker compose up/rebuild actions
+
 4.18.4 (2025-11-21)
 -------------------
 - Fix osl_dockercompose_running? to check actual container states
