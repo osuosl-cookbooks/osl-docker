@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.18.6 (2026-01-08)
+-------------------
+- Debian 13 Integration
+
 4.18.5 (2025-11-27)
 -------------------
 - Add --wait flag to docker compose up/rebuild actions
