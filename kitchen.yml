@@ -82,6 +82,7 @@ suites:
       - recipe[osl-docker::nvidia]
     excludes:
       - debian-12
+      - debian-13
       - ubuntu-24.04
     verifier:
       controls:
@@ -92,6 +93,7 @@ suites:
       - recipe[osl-docker::powerci]
     excludes:
       - debian-12
+      - debian-13
       - ubuntu-24.04
     verifier:
       controls:
@@ -109,6 +111,7 @@ suites:
       multiple_converge: 3
     excludes:
       - debian-12
+      - debian-13
       - ubuntu-24.04
     verifier:
       controls:
