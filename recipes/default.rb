@@ -150,10 +150,10 @@ end
 osl_systemd_unit_drop_in 'iptables-fix' do
   unit_name 'docker.service'
   content({
-    'Unit' => {
-      'PartOf' => 'iptables.service',
-    },
-  })
+            'Unit' => {
+              'PartOf' => 'iptables.service',
+            },
+          })
 end
 
 if osl_docker_package_name == 'docker.io'
