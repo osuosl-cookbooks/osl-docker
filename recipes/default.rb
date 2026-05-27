@@ -133,7 +133,13 @@ end
 
 cron 'docker_prune_volumes' do
   minute '15'
-  command "/usr/bin/docker system prune --volumes -f #{volume_filter.join(' ')} > /dev/null"
+  command "/usr/bin/docker volume prune -f #{volume_filter.join(' ')} > /dev/null"
+  not_if { node['osl-docker']['client_only'] }
+end
+
+cron 'docker_prune_containers' do
+  minute '20'
+  command '/usr/bin/docker container prune -f --filter until=4h > /dev/null'
   not_if { node['osl-docker']['client_only'] }
 end
 

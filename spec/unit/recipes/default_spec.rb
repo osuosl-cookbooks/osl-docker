@@ -32,6 +32,7 @@ describe 'osl-docker::default' do
               'metrics-addr' => '0.0.0.0:9323',
               'experimental' => true,
               'ip6tables' => true,
+              'dns' => %w(140.211.166.130 140.211.166.131 216.165.191.54),
               'log-opts' => {
                 'max-size' => '100m',
                 'max-file' => '10',
@@ -169,25 +170,15 @@ describe 'osl-docker::default' do
       it do
         expect(chef_run).to create_cron('docker_prune_volumes').with(
           minute: '15',
-          command: '/usr/bin/docker system prune --volumes -f  > /dev/null'
+          command: '/usr/bin/docker volume prune -f  > /dev/null'
         )
       end
       it do
-        expect(chef_run).to create_cron('docker_prune_images').with(
-          minute: '45',
-          hour: '2',
-          weekday: '0',
-          command: '/usr/bin/docker system prune -a -f  > /dev/null'
+        expect(chef_run).to create_cron('docker_prune_containers').with(
+          minute: '20',
+          command: '/usr/bin/docker container prune -f --filter until=4h > /dev/null'
         )
       end
-
-      it do
-        expect(chef_run).to create_cron('docker_prune_volumes').with(
-          minute: '15',
-          command: '/usr/bin/docker system prune --volumes -f  > /dev/null'
-        )
-      end
-
       it do
         expect(chef_run).to create_cron('docker_prune_images').with(
           minute: '45',
