@@ -16,8 +16,7 @@ describe 'osl-docker::nvidia' do
       it { is_expected.to install_osl_nvidia_driver('latest') }
 
       it do
-        is_expected.to create_yum_repository('libnvidia-container').with(
-        )
+        is_expected.to create_yum_repository('libnvidia-container').with
       end
 
       it { is_expected.to install_package('nvidia-docker2') }
