@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.19.1 (2026-05-27)
+-------------------
+- Set explicit DNS and scope down hourly prune
+
 4.19.0 (2026-05-27)
 -------------------
 - Update to use docker cookbook 12.0.0
