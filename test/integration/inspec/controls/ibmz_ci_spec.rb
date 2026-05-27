@@ -4,7 +4,8 @@ control 'ibmz-ci' do
   end
 
   describe crontab do
-    its('commands') { should include '/usr/bin/docker system prune --volumes -f --filter label!=preserve=true > /dev/null' }
+    its('commands') { should include '/usr/bin/docker volume prune -f --filter label!=preserve=true > /dev/null' }
+    its('commands') { should include '/usr/bin/docker container prune -f --filter until=4h > /dev/null' }
     its('commands') { should include '/usr/bin/docker system prune -a -f --filter label!=preserve=true > /dev/null' }
   end
 

@@ -59,7 +59,8 @@ control 'default' do
     end
 
     describe crontab do
-      its('commands') { should_not include '/usr/bin/docker system prune --volumes -f  > /dev/null' }
+      its('commands') { should_not include '/usr/bin/docker volume prune -f  > /dev/null' }
+      its('commands') { should_not include '/usr/bin/docker container prune -f --filter until=4h > /dev/null' }
       its('commands') { should_not include '/usr/bin/docker system prune -a -f  > /dev/null' }
     end
   else
@@ -71,13 +72,21 @@ control 'default' do
     describe json '/etc/docker/daemon.json' do
       its('metrics-addr') { should cmp '0.0.0.0:9323' }
       its('experimental') { should cmp 'true' }
+      its('dns') { should cmp %w(140.211.166.130 140.211.166.131 216.165.191.54) }
       its('registry-mirrors') { should cmp %w(https://registry.osuosl.org) }
       its(%w(log-opts max-size)) { should cmp '100m' }
       its(%w(log-opts max-file)) { should cmp '10' }
     end
 
-    describe crontab.where { command =~ /docker system prune --volumes/ } do
+    describe crontab.where { command =~ /docker volume prune/ } do
       its('minutes') { should cmp '15' }
+      its('hours') { should cmp '*' }
+      its('days') { should cmp '*' }
+      its('months') { should cmp '*' }
+    end
+
+    describe crontab.where { command =~ /docker container prune/ } do
+      its('minutes') { should cmp '20' }
       its('hours') { should cmp '*' }
       its('days') { should cmp '*' }
       its('months') { should cmp '*' }

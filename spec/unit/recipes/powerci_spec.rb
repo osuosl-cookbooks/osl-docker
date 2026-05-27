@@ -26,7 +26,13 @@ describe 'osl-docker::powerci' do
 
       it do
         expect(chef_run).to create_cron('docker_prune_volumes').with(
-          command: '/usr/bin/docker system prune --volumes -f --filter label!=preserve=true > /dev/null'
+          command: '/usr/bin/docker volume prune -f --filter label!=preserve=true > /dev/null'
+        )
+      end
+
+      it do
+        expect(chef_run).to create_cron('docker_prune_containers').with(
+          command: '/usr/bin/docker container prune -f --filter until=4h > /dev/null'
         )
       end
 
