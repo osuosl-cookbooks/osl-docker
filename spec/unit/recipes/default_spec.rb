@@ -101,6 +101,7 @@ describe 'osl-docker::default' do
                 [Unit]
                 After=
                 After=network-online.target docker.socket firewalld.service containerd.service sssd.service
+                After=iptables.service ip6tables.service
               EOC
             )
           end
@@ -293,7 +294,7 @@ describe 'osl-docker::default' do
             unit_name: 'docker.service',
             content: {
               'Unit' => {
-                'PartOf' => 'iptables.service',
+                'PartOf' => 'iptables.service ip6tables.service',
               },
             }
           )
