@@ -151,13 +151,15 @@ cron 'docker_prune_images' do
   not_if { node['osl-docker']['client_only'] }
 end
 
-# In the event the node is utilizing iptables, sync docker to restart when iptables restarts.
+# In the event the node is utilizing iptables, sync docker to restart when iptables or ip6tables restarts.
 # Docker automatically adds extra rules to iptables, but these changes are not saved on reloads.
+# The matching After= ordering lives in the 'ldap' drop-in below: drop-ins parse in lexical order and ldap.conf
+# resets After=, so anything added here would be discarded.
 osl_systemd_unit_drop_in 'iptables-fix' do
   unit_name 'docker.service'
   content({
             'Unit' => {
-              'PartOf' => 'iptables.service',
+              'PartOf' => 'iptables.service ip6tables.service',
             },
           })
 end
@@ -178,12 +180,16 @@ else
   end
 end
 
+# dockerd must never start while iptables/ip6tables are mid-restore: with --live-restore and containers running, a
+# failed bridge-network restore at startup leaves the default bridge half-restored and every new container fails with
+# "network <id> does not exist" until the next docker restart (same defect class as moby/moby#52642).
 osl_systemd_unit_drop_in 'ldap' do
   unit_name 'docker.service'
   content <<~EOC
     [Unit]
     After=
     After=network-online.target docker.socket firewalld.service containerd.service sssd.service
+    After=iptables.service ip6tables.service
   EOC
 end
 

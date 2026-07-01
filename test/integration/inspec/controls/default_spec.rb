@@ -20,9 +20,14 @@ control 'default' do
 
   describe command 'systemctl show docker.service' do
     if debian
-      its('stdout') { should match /^PartOf=netfilter-persistent.service$/ }
+      # iptables.service is an alias of netfilter-persistent.service on debian
+      its('stdout') { should match /^PartOf=.*netfilter-persistent.service/ }
+      its('stdout') { should match /^After=.*netfilter-persistent.service/ }
     else
-      its('stdout') { should match /^PartOf=iptables.service$/ }
+      its('stdout') { should match /^PartOf=.*iptables.service/ }
+      its('stdout') { should match /^PartOf=.*ip6tables.service/ }
+      its('stdout') { should match /^After=.*iptables.service/ }
+      its('stdout') { should match /^After=.*ip6tables.service/ }
     end
     its('stdout') { should match /^After=.*sssd.service/ }
   end
