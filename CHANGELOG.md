@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.19.3 (2026-07-14)
+-------------------
+- osl_dockercompose: Require every defined service to be running
+
 4.19.2 (2026-07-01)
 -------------------
 - Order docker after iptables/ip6tables to prevent bridge half-restore
