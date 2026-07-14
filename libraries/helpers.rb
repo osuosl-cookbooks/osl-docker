@@ -27,11 +27,10 @@ module OslDocker
       end
 
       def osl_dockercompose_running?
+        compose_cmd = "docker compose -p #{new_resource.name} #{new_resource.config_files.map { |f| "-f #{f}" }.join(' ')}"
+
         # Check if all containers in the compose project are running
-        cmd = shell_out(
-          "docker compose -p #{new_resource.name} #{new_resource.config_files.map { |f| "-f #{f}" }.join(' ')} ps -a --format json",
-          cwd: new_resource.directory
-        )
+        cmd = shell_out("#{compose_cmd} ps -a --format json", cwd: new_resource.directory)
 
         if cmd.exitstatus != 0
           # If the command fails, the project likely doesn't exist yet
@@ -47,8 +46,32 @@ module OslDocker
         # If no containers are defined or found, consider it as not running
         return false if containers.empty?
 
-        # Check if all containers have State == "running"
-        containers.all? { |container| container['State'] == 'running' }
+        # `ps` cannot report a container that no longer exists, so a service whose
+        # container was removed outright looks identical to a project that never
+        # defined it. That is not hypothetical: the docker_prune_containers cron
+        # reaps any container that has been stopped for 4h, so a service that
+        # crashes overnight silently disappears here. Ask the compose file what is
+        # supposed to be running instead of trusting what happens to be left.
+        services = shell_out("#{compose_cmd} config --services", cwd: new_resource.directory)
+
+        if services.exitstatus != 0
+          Chef::Log.debug("docker compose config failed for #{new_resource.name}, assuming not running")
+          return false
+        end
+
+        defined_services = services.stdout.split(/\r?\n/).map(&:strip).reject(&:empty?)
+        return false if defined_services.empty?
+
+        # Group by service so that a scaled service still counts as down when only
+        # some of its replicas are up. Containers belonging to a service the file
+        # no longer defines are ignored: `up` does not reap orphans, so failing on
+        # them would re-run the compose command on every converge forever.
+        containers_by_service = containers.group_by { |container| container['Service'] }
+
+        defined_services.all? do |service|
+          instances = containers_by_service[service].to_a
+          instances.any? && instances.all? { |container| container['State'] == 'running' }
+        end
       end
 
       def osl_dockerd_path

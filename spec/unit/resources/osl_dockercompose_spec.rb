@@ -6,11 +6,19 @@ describe 'osl_dockercompose' do
 
   before do
     stubs_for_resource('execute[test up]') do |resource|
-      # Stub for docker compose ps -a --format json (returns empty, so not running)
+      # web is up, but db has no container at all, so the project is not running
+      # and the execute has to run.
       allow(resource).to receive_shell_out(
         'docker compose -p test  ps -a --format json',
         { cwd: '/var/lib/test' }
-      ).and_return(double(exitstatus: 0, stdout: ''))
+      ).and_return(
+        double(exitstatus: 0, stdout: %({"Name":"test-web-1","Service":"web","State":"running"}\n))
+      )
+
+      allow(resource).to receive_shell_out(
+        'docker compose -p test  config --services',
+        { cwd: '/var/lib/test' }
+      ).and_return(double(exitstatus: 0, stdout: "web\ndb\n"))
     end
   end
 
