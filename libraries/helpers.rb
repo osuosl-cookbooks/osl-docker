@@ -10,7 +10,8 @@ module OslDocker
       end
 
       def osl_docker_service_manager
-        if osl_docker_setup_repo?
+        # s390x only needs its repo managed by us; the service stays cookbook-managed
+        if osl_docker_setup_repo? || osl_docker_s390x_rhel?
           'auto'
         else
           'none'
@@ -19,10 +20,33 @@ module OslDocker
 
       def osl_docker_setup_repo?
         # have the docker resource setup the docker repos?
-        if %w(riscv64 ppc64le).include? node['kernel']['machine']
+        if %w(riscv64 ppc64le).include?(node['kernel']['machine']) || osl_docker_s390x_rhel?
           false
         else
           node['osl-docker']['setup_repo']
+        end
+      end
+
+      # The docker cookbook maps AlmaLinux to the upstream "centos" repo, which
+      # carries no s390x packages; only the "rhel" repo does. Manage the repo
+      # ourselves on those nodes until this is fixed upstream.
+      def osl_docker_s390x_rhel?
+        node['kernel']['machine'] == 's390x' && rhel?
+      end
+
+      def osl_docker_repo_baseurl
+        if osl_docker_s390x_rhel?
+          'https://download.docker.com/linux/rhel/$releasever/$basearch/stable'
+        else
+          'https://ftp.osuosl.org/pub/osl/repos/yum/$releasever/docker-stable/$basearch'
+        end
+      end
+
+      def osl_docker_repo_gpgkey
+        if osl_docker_s390x_rhel?
+          'https://download.docker.com/linux/rhel/gpg'
+        else
+          osl_gpg_key
         end
       end
 
