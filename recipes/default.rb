@@ -29,12 +29,19 @@ node.default['osl-docker']['service']['host'] = ['unix:///var/run/docker.sock']
 node.default['osl-docker']['service']['host'] << node['osl-docker']['host'] unless node['osl-docker']['host'].nil?
 
 yum_repository 'docker' do
-  baseurl 'https://ftp.osuosl.org/pub/osl/repos/yum/$releasever/docker-stable/$basearch'
-  gpgkey osl_gpg_key
+  baseurl osl_docker_repo_baseurl
+  gpgkey osl_docker_repo_gpgkey
   description 'Docker Stable repository'
   gpgcheck true
   enabled true
-  only_if { %w(ppc64le).include?(node['kernel']['machine']) && rhel? }
+  only_if { %w(ppc64le s390x).include?(node['kernel']['machine']) && rhel? }
+end
+
+# The docker cookbook removes these alongside its repo setup since they conflict
+# with docker-ce's dependencies; keep doing that where we manage the repo instead
+package %w(buildah podman) do
+  action :remove
+  only_if { osl_docker_s390x_rhel? }
 end
 
 docker_service 'default' do

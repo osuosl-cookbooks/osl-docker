@@ -168,6 +168,50 @@ describe 'osl-docker::default' do
         end
       end
 
+      context 's390x' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p) do |node|
+            node.automatic['kernel']['machine'] = 's390x'
+          end.converge(described_recipe)
+        end
+
+        case p
+        when *ALL_RHEL
+          it do
+            expect(chef_run).to create_docker_service('default').with(
+              setup_docker_repo: false,
+              package_name: 'docker-ce',
+              service_manager: 'auto',
+              host: %w(unix:///var/run/docker.sock),
+              misc_opts: '--live-restore'
+            )
+          end
+
+          it do
+            is_expected.to create_yum_repository('docker').with(
+              baseurl: 'https://download.docker.com/linux/rhel/$releasever/$basearch/stable',
+              gpgkey: 'https://download.docker.com/linux/rhel/gpg',
+              description: 'Docker Stable repository',
+              gpgcheck: true,
+              enabled: true
+            )
+          end
+
+          it { is_expected.to remove_package 'buildah, podman' }
+        else
+          it { is_expected.to_not create_yum_repository 'docker' }
+          it { is_expected.to_not remove_package 'buildah, podman' }
+
+          it do
+            expect(chef_run).to create_docker_service('default').with(
+              setup_docker_repo: true,
+              package_name: 'docker-ce',
+              service_manager: 'auto'
+            )
+          end
+        end
+      end
+
       it do
         expect(chef_run).to create_cron('docker_prune_volumes').with(
           minute: '15',
