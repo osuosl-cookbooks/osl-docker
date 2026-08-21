@@ -16,9 +16,9 @@ describe 'osl_dockercompose' do
       )
 
       allow(resource).to receive_shell_out(
-        'docker compose -p test  config --services',
+        'docker compose -p test  config --format json',
         { cwd: '/var/lib/test' }
-      ).and_return(double(exitstatus: 0, stdout: "web\ndb\n"))
+      ).and_return(double(exitstatus: 0, stdout: %({"services":{"web":{},"db":{}}})))
     end
   end
 
