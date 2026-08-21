@@ -32,13 +32,15 @@ RSpec.describe OslDocker::Cookbook::Helpers do
     let(:shell_out_result) { double('shell_out_result', exitstatus: exitstatus, stdout: stdout) }
     let(:config_exitstatus) { 0 }
     let(:config_services) { %w(web db) }
+    let(:config_restarts) { {} }
     let(:config_result) do
-      double('config_result', exitstatus: config_exitstatus, stdout: "#{config_services.join("\n")}\n")
+      services = config_services.to_h { |s| [s, config_restarts.key?(s) ? { 'restart' => config_restarts[s] } : {}] }
+      double('config_result', exitstatus: config_exitstatus, stdout: JSON.generate('services' => services))
     end
 
     before do
       allow(subject).to receive(:shell_out).with(/ps -a --format json/, any_args).and_return(shell_out_result)
-      allow(subject).to receive(:shell_out).with(/config --services/, any_args).and_return(config_result)
+      allow(subject).to receive(:shell_out).with(/config --format json/, any_args).and_return(config_result)
     end
 
     context 'when all containers are running' do
@@ -65,7 +67,7 @@ RSpec.describe OslDocker::Cookbook::Helpers do
       it 'calls docker compose config with correct arguments' do
         subject.osl_dockercompose_running?
         expect(subject).to have_received(:shell_out).with(
-          'docker compose -p test-compose -f docker-compose.yml config --services',
+          'docker compose -p test-compose -f docker-compose.yml config --format json',
           cwd: '/var/lib/compose'
         )
       end
@@ -139,6 +141,83 @@ RSpec.describe OslDocker::Cookbook::Helpers do
 
       it 'ignores the orphan and returns true' do
         expect(subject.osl_dockercompose_running?).to eq true
+      end
+    end
+
+    context 'when a one-shot service has exited successfully' do
+      let(:exitstatus) { 0 }
+      let(:config_services) { %w(web migrate) }
+      let(:config_restarts) { { 'migrate' => 'no' } }
+      let(:stdout) do
+        <<~JSON
+          {"Name":"test-compose-web-1","Service":"web","State":"running","Status":"Up 5 minutes"}
+          {"Name":"test-compose-migrate-1","Service":"migrate","State":"exited","Status":"Exited (0) 5 minutes ago"}
+        JSON
+      end
+
+      it 'ignores the one-shot and returns true' do
+        expect(subject.osl_dockercompose_running?).to eq true
+      end
+    end
+
+    context 'when a one-shot service container was pruned' do
+      let(:exitstatus) { 0 }
+      let(:config_services) { %w(web migrate) }
+      let(:config_restarts) { { 'migrate' => 'no' } }
+      let(:stdout) do
+        <<~JSON
+          {"Name":"test-compose-web-1","Service":"web","State":"running","Status":"Up 5 minutes"}
+        JSON
+      end
+
+      it 'ignores the missing one-shot and returns true' do
+        expect(subject.osl_dockercompose_running?).to eq true
+      end
+    end
+
+    context 'when a long-running service is stopped alongside a one-shot' do
+      let(:exitstatus) { 0 }
+      let(:config_services) { %w(web migrate) }
+      let(:config_restarts) { { 'migrate' => 'no' } }
+      let(:stdout) do
+        <<~JSON
+          {"Name":"test-compose-web-1","Service":"web","State":"exited","Status":"Exited (1) 2 minutes ago"}
+          {"Name":"test-compose-migrate-1","Service":"migrate","State":"exited","Status":"Exited (0) 5 minutes ago"}
+        JSON
+      end
+
+      it 'returns false' do
+        expect(subject.osl_dockercompose_running?).to eq false
+      end
+    end
+
+    context 'when a stopped service has a non-no restart policy' do
+      let(:exitstatus) { 0 }
+      let(:config_services) { %w(web) }
+      let(:config_restarts) { { 'web' => 'unless-stopped' } }
+      let(:stdout) do
+        <<~JSON
+          {"Name":"test-compose-web-1","Service":"web","State":"exited","Status":"Exited (1) 2 minutes ago"}
+        JSON
+      end
+
+      it 'still counts the service and returns false' do
+        expect(subject.osl_dockercompose_running?).to eq false
+      end
+    end
+
+    context 'when every service is a one-shot' do
+      let(:exitstatus) { 0 }
+      let(:config_services) { %w(migrate) }
+      let(:config_restarts) { { 'migrate' => 'no' } }
+      let(:stdout) do
+        <<~JSON
+          {"Name":"test-compose-migrate-1","Service":"migrate","State":"exited","Status":"Exited (0) 5 minutes ago"}
+        JSON
+      end
+
+      it 'returns false' do
+        expect(subject.osl_dockercompose_running?).to eq false
       end
     end
 
@@ -238,7 +317,7 @@ RSpec.describe OslDocker::Cookbook::Helpers do
       it 'includes all config files in the config command' do
         subject.osl_dockercompose_running?
         expect(subject).to have_received(:shell_out).with(
-          'docker compose -p multi-config -f docker-compose.yml -f docker-compose.override.yml config --services',
+          'docker compose -p multi-config -f docker-compose.yml -f docker-compose.override.yml config --format json',
           cwd: '/opt/services'
         )
       end
