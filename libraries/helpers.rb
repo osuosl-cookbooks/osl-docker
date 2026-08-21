@@ -76,14 +76,18 @@ module OslDocker
         # reaps any container that has been stopped for 4h, so a service that
         # crashes overnight silently disappears here. Ask the compose file what is
         # supposed to be running instead of trusting what happens to be left.
-        services = shell_out("#{compose_cmd} config --services", cwd: new_resource.directory)
+        config = shell_out("#{compose_cmd} config --format json", cwd: new_resource.directory)
 
-        if services.exitstatus != 0
+        if config.exitstatus != 0
           Chef::Log.debug("docker compose config failed for #{new_resource.name}, assuming not running")
           return false
         end
 
-        defined_services = services.stdout.split(/\r?\n/).map(&:strip).reject(&:empty?)
+        # One-shot services (restart "no", e.g. a migration gate) are expected to
+        # exit, and their stopped containers get pruned; `up --wait` already
+        # enforces their success through depends_on conditions. Only services
+        # meant to stay up count toward the running check.
+        defined_services = JSON.parse(config.stdout)['services'].to_h.reject { |_, svc| svc['restart'] == 'no' }.keys
         return false if defined_services.empty?
 
         # Group by service so that a scaled service still counts as down when only

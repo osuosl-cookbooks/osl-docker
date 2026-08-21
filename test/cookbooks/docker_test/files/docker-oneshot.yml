@@ -1,0 +1,11 @@
+services:
+  migrate:
+    image: alpine
+    command: [/bin/echo, migrated]
+    restart: "no"
+  hello_world:
+    image: alpine
+    command: [/bin/sleep, '1d']
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
