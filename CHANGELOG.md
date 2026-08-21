@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.19.5 (2026-08-21)
+-------------------
+- osl_dockercompose: Ignore one-shot services in running check
+
 4.19.4 (2026-07-20)
 -------------------
 - Use the upstream rhel repo for docker on s390x
