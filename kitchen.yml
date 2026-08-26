@@ -17,7 +17,9 @@ verifier:
   name: inspec
   inspec_tests:
     - path: test/integration/inspec
-  
+
+  auto_install_gems: true
+
 suites:
   - name: default
     run_list:
