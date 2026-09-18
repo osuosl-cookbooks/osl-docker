@@ -17,7 +17,7 @@ verifier:
   name: inspec
   inspec_tests:
     - path: test/integration/inspec
-
+  
 suites:
   - name: default
     run_list:

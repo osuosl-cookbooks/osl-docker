@@ -1,7 +1,5 @@
 name: osl-docker
 depends:
-  - name: inspec-docker-resources
-    gem: inspec-docker-resources
 inputs:
   - name: docker_env
     value: ''
