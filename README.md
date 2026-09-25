@@ -21,6 +21,9 @@ Attributes
 - ``node['osl-docker']['service'] `` -- Key/value hash which directly relates to the ``docker_service``.
 - ``node['osl-docker']['tls']`` -- Boolean for enabling TLS for the docker service. Default: ``false``
 - ``node['osl-docker']['data_bag']`` -- Name of the data bag to find the TLS certificates. Default: ``docker``
+- ``node['osl-docker']['ipv6_accept_ra']`` -- Keep honouring IPv6 router advertisements on the default interface
+  once dockerd enables forwarding (see `osl-docker::default`). Set to ``false`` to keep a host IPv4-only.
+  Default: ``true``
 
 For example, if you wish to set the package version you could do the following:
 
@@ -76,6 +79,24 @@ Usage
 #### osl-docker::default
 
 Installs Docker from Docker Inc's repo and starts the docker service
+
+dockerd enables IPv6 forwarding, and a forwarding kernel ignores router advertisements, so a host that gets its
+IPv6 address by kernel SLAAC loses its IPv6 default route, or never gets an address when dockerd starts before the
+first RA. When the kernel handles RAs on the default interface (`accept_ra` is not `0`), this recipe sets
+`net/ipv6/conf/<interface>/accept_ra` to `2` so RAs keep being honoured. Interfaces where NetworkManager handles RAs
+itself (`accept_ra` is `0`) are left alone. A host on a network that sends RAs gains IPv6 on its next converge; set
+``node['osl-docker']['ipv6_accept_ra']`` to ``false`` to prevent that.
+
+Setting the attribute to ``false`` on a host that already converged removes the persisted setting, which takes effect
+at the next boot. To drop IPv6 immediately, also run:
+
+``` console
+sysctl -w net/ipv6/conf/<interface>/accept_ra=1
+ip -6 addr flush dev <interface> scope global dynamic
+```
+
+Without the flush, the SLAAC address outlives its default route (the routers checked so far advertise a 60 second
+router lifetime) and Nagios keeps checking an address the host can no longer answer on.
 
 Contributing
 ------------

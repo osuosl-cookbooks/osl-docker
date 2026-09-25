@@ -102,6 +102,12 @@ module OslDocker
         end
       end
 
+      # True when the kernel handles RAs on iface. NetworkManager and networkd set accept_ra=0 when they run RA.
+      def osl_docker_kernel_ra?(iface)
+        path = "/proc/sys/net/ipv6/conf/#{iface}/accept_ra"
+        ::File.exist?(path) && ::File.read(path).strip != '0'
+      end
+
       def osl_dockerd_path
         if platform?('debian')
           '/usr/sbin/dockerd'

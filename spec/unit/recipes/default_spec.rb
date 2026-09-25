@@ -9,8 +9,61 @@ describe 'osl-docker::default' do
 
       include_context 'common_stubs'
 
+      let(:accept_ra) { "1\n" }
+
+      before do
+        allow(File).to receive(:exist?).and_call_original
+        allow(File).to receive(:exist?).with('/proc/sys/net/ipv6/conf/eth0/accept_ra').and_return(true)
+        allow(File).to receive(:read).and_call_original
+        allow(File).to receive(:read).with('/proc/sys/net/ipv6/conf/eth0/accept_ra').and_return(accept_ra)
+      end
+
       it 'converges successfully' do
         expect { chef_run }.to_not raise_error
+      end
+
+      it { is_expected.to create_if_missing_file('/etc/sysctl.conf') }
+      it { is_expected.to apply_sysctl('net/ipv6/conf/eth0/accept_ra').with(value: '2') }
+
+      context 'accept_ra already 2' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p).converge(described_recipe)
+        end
+
+        let(:accept_ra) { "2\n" }
+
+        it { is_expected.to apply_sysctl('net/ipv6/conf/eth0/accept_ra').with(value: '2') }
+      end
+
+      context 'NetworkManager handles RAs' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p).converge(described_recipe)
+        end
+
+        let(:accept_ra) { "0\n" }
+
+        it { is_expected.to_not apply_sysctl('net/ipv6/conf/eth0/accept_ra') }
+      end
+
+      context 'ipv6_accept_ra disabled' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p) do |node|
+            node.normal['osl-docker']['ipv6_accept_ra'] = false
+          end.converge(described_recipe)
+        end
+
+        it { is_expected.to_not apply_sysctl('net/ipv6/conf/eth0/accept_ra') }
+        it { is_expected.to remove_sysctl('net/ipv6/conf/eth0/accept_ra') }
+      end
+
+      context 'no default interface' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p) do |node|
+            node.automatic['network']['default_interface'] = nil
+          end.converge(described_recipe)
+        end
+
+        it { is_expected.to_not apply_sysctl('net/ipv6/conf/eth0/accept_ra') }
       end
 
       it { expect(chef_run).to accept_osl_firewall_docker('osl-docker') }
