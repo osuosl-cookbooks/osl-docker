@@ -27,6 +27,8 @@ suites:
       controls:
         - default
         - selinux
+      inputs:
+        kernel_ra: true
   - name: default_setup_repo
     run_list:
       - recipe[docker_test]
@@ -35,6 +37,8 @@ suites:
       controls:
         - default
         - selinux
+      inputs:
+        kernel_ra: true
     attributes:
       osl-docker:
         setup_repo: false
@@ -58,6 +62,7 @@ suites:
         - default
         - selinux
       inputs:
+        kernel_ra: true
         tls: true
         docker_env: 'DOCKER_HOST="tcp://127.0.0.1:2376" DOCKER_CERT_PATH="/etc/docker/ssl" DOCKER_TLS_VERIFY="1"'
   - name: osl_dockercompose

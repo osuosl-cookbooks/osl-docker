@@ -7,3 +7,5 @@ inputs:
     value: false
   - name: client_only
     value: false
+  - name: kernel_ra
+    value: false

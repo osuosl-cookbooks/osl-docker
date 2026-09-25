@@ -1,6 +1,7 @@
 docker_env = input('docker_env')
 client_only = input('client_only')
 tls = input('tls')
+kernel_ra = input('kernel_ra')
 debian = os.family == 'debian'
 
 control 'default' do
@@ -107,6 +108,30 @@ control 'default' do
 
     describe port 9323 do
       it { should be_listening }
+    end
+
+    iface = command('ip -o -4 route show default').stdout[/ dev (\S+)/, 1]
+    accept_ra = kernel_parameter("net/ipv6/conf/#{iface}/accept_ra")
+
+    # dockerd forwards, so the kernel only honours RAs at 2; 0 means NetworkManager runs RA itself.
+    if kernel_ra
+      describe accept_ra do
+        its('value') { should eq 2 }
+      end
+
+      describe file("/etc/sysctl.d/99-chef-net.ipv6.conf.#{iface}.accept_ra.conf") do
+        its('content') { should match %r{^net/ipv6/conf/#{iface}/accept_ra = 2$} }
+      end
+    elsif file("/proc/sys/net/ipv6/conf/#{iface}/accept_ra").exist?
+      describe accept_ra do
+        its('value') { should be_in [0, 2] }
+      end
+    end
+
+    if accept_ra.value == 2 && !command("ip -6 -o addr show dev #{iface} scope global").stdout.empty?
+      describe command('ip -6 route show default') do
+        its('stdout') { should match /^default via fe80::/ }
+      end
     end
 
     describe iptables do

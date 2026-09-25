@@ -403,4 +403,41 @@ RSpec.describe OslDocker::Cookbook::Helpers do
       end
     end
   end
+
+  describe '#osl_docker_kernel_ra?' do
+    let(:path) { '/proc/sys/net/ipv6/conf/eth0/accept_ra' }
+
+    before do
+      allow(File).to receive(:exist?).with(path).and_return(exists)
+      allow(File).to receive(:read).with(path).and_return(value)
+    end
+
+    context 'when the kernel handles RAs' do
+      let(:exists) { true }
+      let(:value) { "1\n" }
+
+      it { expect(subject.osl_docker_kernel_ra?('eth0')).to eq true }
+    end
+
+    context 'when NetworkManager handles RAs' do
+      let(:exists) { true }
+      let(:value) { "0\n" }
+
+      it { expect(subject.osl_docker_kernel_ra?('eth0')).to eq false }
+    end
+
+    context 'when RAs are already accepted while forwarding' do
+      let(:exists) { true }
+      let(:value) { "2\n" }
+
+      it { expect(subject.osl_docker_kernel_ra?('eth0')).to eq true }
+    end
+
+    context 'when IPv6 is disabled on the interface' do
+      let(:exists) { false }
+      let(:value) { nil }
+
+      it { expect(subject.osl_docker_kernel_ra?('eth0')).to eq false }
+    end
+  end
 end

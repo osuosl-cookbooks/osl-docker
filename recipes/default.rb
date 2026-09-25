@@ -44,6 +44,24 @@ package %w(buildah podman) do
   only_if { osl_docker_s390x_rhel? }
 end
 
+default_iface = node['network']['default_interface']
+
+# Cinc 19.3's sysctl resource runs `sysctl -p`, which fails on Debian 13 without this file (base does the same).
+file '/etc/sysctl.conf' do
+  action :create_if_missing
+end
+
+# dockerd turns on IPv6 forwarding, and a forwarding kernel ignores RAs unless accept_ra is 2. The slash form
+# keeps dotted (VLAN) interface names intact.
+sysctl "net/ipv6/conf/#{default_iface}/accept_ra" do
+  if node['osl-docker']['ipv6_accept_ra']
+    value 2
+    only_if { osl_docker_kernel_ra?(default_iface) }
+  else
+    action :remove
+  end
+end if default_iface
+
 docker_service 'default' do
   node['osl-docker']['service'].each do |key, value|
     send(key.to_sym, value)

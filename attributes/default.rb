@@ -17,3 +17,4 @@ default['osl-docker']['host'] = node['osl-docker']['tls'] ? 'tcp://127.0.0.1:237
 default['osl-docker']['data_bag'] = 'docker'
 default['osl-docker']['client_only'] = false
 default['osl-docker']['setup_repo'] = true
+default['osl-docker']['ipv6_accept_ra'] = true
