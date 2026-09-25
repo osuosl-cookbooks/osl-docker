@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.19.6 (2026-09-25)
+-------------------
+- Keep IPv6 RA default routes while dockerd forwards
+
 4.19.5 (2026-08-21)
 -------------------
 - osl_dockercompose: Ignore one-shot services in running check
