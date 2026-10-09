@@ -24,6 +24,11 @@ Attributes
 - ``node['osl-docker']['ipv6_accept_ra']`` -- Keep honouring IPv6 router advertisements on the default interface
   once dockerd enables forwarding (see `osl-docker::default`). Set to ``false`` to keep a host IPv4-only.
   Default: ``true``
+- ``node['osl-docker']['prune']['volume_filter']`` -- Filters (``label!=preserve=true``) added to the hourly volume prune
+  and the weekly ``docker system prune -a``. Default: ``[]``
+- ``node['osl-docker']['prune']['until']`` -- Age limit for the weekly ``docker system prune -a`` (``--filter until=``),
+  so images, containers and networks younger than this survive it. Docker dates an image by its pull on the containerd
+  image store and by its build on overlay2, never by its last use. Default: ``nil`` (prune every unused image)
 
 For example, if you wish to set the package version you could do the following:
 

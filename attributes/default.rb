@@ -12,6 +12,8 @@ default['osl-docker']['daemon'] =
     'registry-mirrors' => %w(https://registry.osuosl.org),
   }
 default['osl-docker']['prune']['volume_filter'] = []
+# Age limit for the weekly image prune, e.g. '168h'; nil prunes every unused image.
+default['osl-docker']['prune']['until'] = nil
 default['osl-docker']['tls'] = false
 default['osl-docker']['host'] = node['osl-docker']['tls'] ? 'tcp://127.0.0.1:2376' : nil
 default['osl-docker']['data_bag'] = 'docker'
