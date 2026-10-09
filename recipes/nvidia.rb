@@ -24,6 +24,25 @@ node.default['osl-docker']['daemon']['runtimes'] = {
   },
 }
 
+package %w(make selinux-policy-devel) do
+  action :install
+end
+
+selinux_module 'dkms_restorecon' do
+  content <<~EOM
+    module dkms_restorecon 1.0;
+
+    require {
+            type var_lib_t;
+            type setfiles_t;
+            class file append;
+    }
+
+    #============= setfiles_t =============
+    allow setfiles_t var_lib_t:file append;
+  EOM
+end
+
 osl_nvidia_driver 'latest'
 
 yum_repository 'libnvidia-container' do
