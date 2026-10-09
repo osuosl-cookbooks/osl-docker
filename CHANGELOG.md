@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.20.0 (2026-10-09)
+-------------------
+- Let callers age-limit the weekly image prune
+
 4.19.6 (2026-09-25)
 -------------------
 - Keep IPv6 RA default routes while dockerd forwards
