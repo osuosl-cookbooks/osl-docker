@@ -286,6 +286,28 @@ describe 'osl-docker::default' do
         )
       end
 
+      context 'with an age limit on the image prune' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p) do |node|
+            node.normal['osl-docker']['prune']['until'] = '168h'
+            node.normal['osl-docker']['prune']['volume_filter'] = %w(label!=preserve=true)
+          end.converge(described_recipe)
+        end
+
+        it do
+          expect(chef_run).to create_cron('docker_prune_images').with(
+            command: '/usr/bin/docker system prune -a -f --filter label!=preserve=true --filter until=168h > /dev/null'
+          )
+        end
+
+        # docker volume prune rejects an until filter
+        it do
+          expect(chef_run).to create_cron('docker_prune_volumes').with(
+            command: '/usr/bin/docker volume prune -f --filter label!=preserve=true > /dev/null'
+          )
+        end
+      end
+
       case p
       when *ALL_RHEL
         it do

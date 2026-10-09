@@ -168,11 +168,14 @@ cron 'docker_prune_containers' do
   not_if { node['osl-docker']['client_only'] }
 end
 
+image_filter = volume_filter.dup
+image_filter << "--filter until=#{node['osl-docker']['prune']['until']}" if node['osl-docker']['prune']['until']
+
 cron 'docker_prune_images' do
   minute '45'
   hour '2'
   weekday '0'
-  command "/usr/bin/docker system prune -a -f #{volume_filter.join(' ')} > /dev/null"
+  command "/usr/bin/docker system prune -a -f #{image_filter.join(' ')} > /dev/null"
   not_if { node['osl-docker']['client_only'] }
 end
 
