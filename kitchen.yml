@@ -29,6 +29,20 @@ suites:
         - selinux
       inputs:
         kernel_ra: true
+  - name: default_nftables
+    run_list:
+      - recipe[docker_test]
+      - recipe[osl-docker::default]
+    attributes:
+      osl-firewall:
+        backend: nftables
+    verifier:
+      controls:
+        - default
+        - selinux
+      inputs:
+        kernel_ra: true
+        firewall_backend: nftables
   - name: default_setup_repo
     run_list:
       - recipe[docker_test]

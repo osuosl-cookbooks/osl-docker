@@ -103,6 +103,21 @@ ip -6 addr flush dev <interface> scope global dynamic
 Without the flush, the SLAAC address outlives its default route (the routers checked so far advertise a 60 second
 router lifetime) and Nagios keeps checking an address the host can no longer answer on.
 
+How docker.service is tied to the host firewall follows the node's `osl-firewall` backend
+(`node['osl-firewall']['backend']`):
+
+| | `iptables` (default) | `nftables` |
+|---|---|---|
+| `PartOf=` | `iptables.service ip6tables.service`, because an iptables restart flushes Docker's rules | none: osl-firewall's nftables reloads never touch them |
+| `After=` | `iptables.service ip6tables.service` | `osl-firewall.service` |
+| `daemon.json` | unchanged | `ip-forward-no-drop: true` with docker-ce |
+
+Docker sets the iptables `FORWARD` policy to drop whenever it enables IP forwarding itself, which on nftables hosts
+happens at every boot. On iptables hosts osl-firewall's `DOCKER-USER` accept rule hides that; on nftables hosts
+`ip-forward-no-drop` keeps other routed traffic, such as libvirt guests on CI runners, flowing. The distro
+`docker.io` package (riscv64 and ppc64le Debian) may predate the option, so it is set only with docker-ce. A host
+switched to nftables restarts Docker once for the `daemon.json` change; `--live-restore` keeps containers running.
+
 Contributing
 ------------
 

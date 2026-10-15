@@ -1,4 +1,5 @@
 name: osl-docker
+version: 1.0.0
 depends:
   - name: inspec-docker-resources
     gem: inspec-docker-resources
@@ -11,3 +12,5 @@ inputs:
     value: false
   - name: kernel_ra
     value: false
+  - name: firewall_backend
+    value: iptables

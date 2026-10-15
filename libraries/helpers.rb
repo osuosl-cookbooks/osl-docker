@@ -127,6 +127,17 @@ module OslDocker
           raise
         end
       end
+
+      # Units that load the host firewall, for docker.service's boot ordering
+      def osl_docker_firewall_units
+        osl_firewall_nftables? ? 'osl-firewall.service' : 'iptables.service ip6tables.service'
+      end
+
+      # Without our iptables DOCKER-USER accept, Docker's FORWARD drop would block
+      # other routed traffic; distro docker.io may predate the opt-out
+      def osl_docker_ip_forward_no_drop?
+        osl_firewall_nftables? && osl_docker_package_name == 'docker-ce'
+      end
     end
   end
 end

@@ -440,4 +440,29 @@ RSpec.describe OslDocker::Cookbook::Helpers do
       it { expect(subject.osl_docker_kernel_ra?('eth0')).to eq false }
     end
   end
+
+  describe 'firewall backend helpers' do
+    context 'on iptables' do
+      before { allow(subject).to receive(:osl_firewall_nftables?).and_return(false) }
+
+      it { expect(subject.osl_docker_firewall_units).to eq 'iptables.service ip6tables.service' }
+      it { expect(subject.osl_docker_ip_forward_no_drop?).to be false }
+    end
+
+    context 'on nftables' do
+      before { allow(subject).to receive(:osl_firewall_nftables?).and_return(true) }
+
+      it { expect(subject.osl_docker_firewall_units).to eq 'osl-firewall.service' }
+
+      it 'opts out of the FORWARD drop with docker-ce' do
+        allow(subject).to receive(:osl_docker_package_name).and_return('docker-ce')
+        expect(subject.osl_docker_ip_forward_no_drop?).to be true
+      end
+
+      it 'leaves the distro docker.io alone' do
+        allow(subject).to receive(:osl_docker_package_name).and_return('docker.io')
+        expect(subject.osl_docker_ip_forward_no_drop?).to be false
+      end
+    end
+  end
 end
