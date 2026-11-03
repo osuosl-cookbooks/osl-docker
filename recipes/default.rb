@@ -62,6 +62,22 @@ sysctl "net/ipv6/conf/#{default_iface}/accept_ra" do
   end
 end if default_iface
 
+directory '/etc/docker'
+
+# Docker sets FORWARD to drop when it enables forwarding itself, as on every
+# nftables host at boot; keep other routed traffic (libvirt guests) flowing
+node.default['osl-docker']['daemon']['ip-forward-no-drop'] = true if osl_docker_ip_forward_no_drop?
+
+# Before docker_service: Debian's package starts dockerd on install, and that
+# start must already read this config (ip-forward-no-drop above all)
+template '/etc/docker/daemon.json' do
+  variables(
+    config: node['osl-docker']['daemon']
+  )
+  not_if { node['osl-docker']['client_only'] }
+  notifies :restart, 'docker_service[default]'
+end
+
 docker_service 'default' do
   node['osl-docker']['service'].each do |key, value|
     send(key.to_sym, value)
@@ -84,20 +100,6 @@ docker_service 'default' do
   else
     action [:create]
   end
-end
-
-directory '/etc/docker'
-
-# Docker sets FORWARD to drop when it enables forwarding itself, as on every
-# nftables host at boot; keep other routed traffic (libvirt guests) flowing
-node.default['osl-docker']['daemon']['ip-forward-no-drop'] = true if osl_docker_ip_forward_no_drop?
-
-template '/etc/docker/daemon.json' do
-  variables(
-    config: node['osl-docker']['daemon']
-  )
-  not_if { node['osl-docker']['client_only'] }
-  notifies :restart, 'docker_service[default]'
 end
 
 directory '/etc/docker/ssl' do

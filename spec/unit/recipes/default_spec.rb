@@ -96,6 +96,13 @@ describe 'osl-docker::default' do
         )
       end
       it { expect(chef_run.template('/etc/docker/daemon.json')).to notify('docker_service[default]').to(:restart) }
+
+      # Debian's package starts dockerd on install, so the config must be in place first
+      it 'writes daemon.json before docker_service installs Docker' do
+        names = chef_run.resource_collection.all_resources.map(&:to_s)
+        expect(names.index('template[/etc/docker/daemon.json]')).to be < names.index('docker_service[default]')
+      end
+
       it { expect(chef_run).to_not create_directory('/etc/docker/ssl') }
       it { expect(chef_run).to_not create_certificate_manage('server-fauxhai-local') }
       it { expect(chef_run).to_not create_certificate_manage('client-fauxhai-local') }
