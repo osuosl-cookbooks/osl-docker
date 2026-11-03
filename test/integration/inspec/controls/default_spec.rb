@@ -155,12 +155,19 @@ control 'default' do
       end
     end
 
-    describe iptables do
-      it { should have_rule('-A prometheus -p tcp -m tcp --dport 9323 -j osl_only') }
-    end
+    if nftables
+      # One inet chain covers IPv4 and IPv6
+      describe command('nft list chain inet osl svc_prometheus') do
+        its('stdout') { should match /^\s+tcp dport 9323 jump osl_only$/ }
+      end
+    else
+      describe iptables do
+        it { should have_rule('-A prometheus -p tcp -m tcp --dport 9323 -j osl_only') }
+      end
 
-    describe ip6tables do
-      it { should have_rule('-A prometheus -p tcp -m tcp --dport 9323 -j osl_only') }
+      describe ip6tables do
+        it { should have_rule('-A prometheus -p tcp -m tcp --dport 9323 -j osl_only') }
+      end
     end
 
     describe http 'http://localhost:9323/metrics' do
