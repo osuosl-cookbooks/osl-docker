@@ -48,6 +48,11 @@ describe 'osl-docker::nvidia' do
       end
 
       it { is_expected.to create_selinux_module('nvidia_docker') }
+
+      it do
+        is_expected.to create_selinux_module('dkms_restorecon')
+          .with(content: /allow setfiles_t var_lib_t:file append;/)
+      end
     end
   end
 end
