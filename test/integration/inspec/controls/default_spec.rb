@@ -2,6 +2,7 @@ docker_env = input('docker_env')
 client_only = input('client_only')
 tls = input('tls')
 kernel_ra = input('kernel_ra')
+nftables = input('firewall_backend') == 'nftables'
 debian = os.family == 'debian'
 
 control 'default' do
@@ -20,7 +21,11 @@ control 'default' do
   end
 
   describe command 'systemctl show docker.service' do
-    if debian
+    if nftables
+      # nftables reloads never touch Docker's rules, so nothing restarts it
+      its('stdout') { should_not match /^PartOf=.*(iptables|netfilter-persistent)/ }
+      its('stdout') { should match /^After=.*osl-firewall.service/ }
+    elsif debian
       # iptables.service is an alias of netfilter-persistent.service on debian
       its('stdout') { should match /^PartOf=.*netfilter-persistent.service/ }
       its('stdout') { should match /^After=.*netfilter-persistent.service/ }
@@ -82,6 +87,22 @@ control 'default' do
       its('registry-mirrors') { should cmp %w(https://registry.osuosl.org) }
       its(%w(log-opts max-size)) { should cmp '100m' }
       its(%w(log-opts max-file)) { should cmp '10' }
+      if nftables
+        its('ip-forward-no-drop') { should cmp 'true' }
+      else
+        its('ip-forward-no-drop') { should be_nil }
+      end
+    end
+
+    if nftables
+      describe command 'iptables -S FORWARD' do
+        its('stdout') { should match /^-P FORWARD ACCEPT$/ }
+      end
+
+      # Container egress crosses osl-firewall's forward chain and Docker's together
+      describe command 'docker run --rm quay.io/prometheus/busybox:latest wget -q -O /dev/null http://ftp.osuosl.org/' do
+        its('exit_status') { should eq 0 }
+      end
     end
 
     describe crontab.where { command =~ /docker volume prune/ } do
@@ -134,12 +155,19 @@ control 'default' do
       end
     end
 
-    describe iptables do
-      it { should have_rule('-A prometheus -p tcp -m tcp --dport 9323 -j osl_only') }
-    end
+    if nftables
+      # One inet chain covers IPv4 and IPv6
+      describe command('nft list chain inet osl svc_prometheus') do
+        its('stdout') { should match /^\s+tcp dport 9323 jump osl_only$/ }
+      end
+    else
+      describe iptables do
+        it { should have_rule('-A prometheus -p tcp -m tcp --dport 9323 -j osl_only') }
+      end
 
-    describe ip6tables do
-      it { should have_rule('-A prometheus -p tcp -m tcp --dport 9323 -j osl_only') }
+      describe ip6tables do
+        it { should have_rule('-A prometheus -p tcp -m tcp --dport 9323 -j osl_only') }
+      end
     end
 
     describe http 'http://localhost:9323/metrics' do

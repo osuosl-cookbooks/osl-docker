@@ -96,6 +96,13 @@ describe 'osl-docker::default' do
         )
       end
       it { expect(chef_run.template('/etc/docker/daemon.json')).to notify('docker_service[default]').to(:restart) }
+
+      # Debian's package starts dockerd on install, so the config must be in place first
+      it 'writes daemon.json before docker_service installs Docker' do
+        names = chef_run.resource_collection.all_resources.map(&:to_s)
+        expect(names.index('template[/etc/docker/daemon.json]')).to be < names.index('docker_service[default]')
+      end
+
       it { expect(chef_run).to_not create_directory('/etc/docker/ssl') }
       it { expect(chef_run).to_not create_certificate_manage('server-fauxhai-local') }
       it { expect(chef_run).to_not create_certificate_manage('client-fauxhai-local') }
@@ -420,5 +427,63 @@ describe 'osl-docker::default' do
         end
       end
     end
+  end
+end
+
+describe 'osl-docker::default on the nftables firewall backend' do
+  [ALMA_9, DEBIAN_12].each do |p|
+    context "#{p[:platform]} #{p[:version]}" do
+      cached(:chef_run) do
+        ChefSpec::SoloRunner.new(p) do |node|
+          node.normal['osl-firewall']['backend'] = 'nftables'
+        end.converge('osl-docker::default')
+      end
+
+      include_context 'common_stubs'
+
+      before do
+        allow(File).to receive(:exist?).and_call_original
+        allow(File).to receive(:exist?).with('/proc/sys/net/ipv6/conf/eth0/accept_ra').and_return(false)
+      end
+
+      it { is_expected.to delete_osl_systemd_unit_drop_in('iptables-fix') }
+      it do
+        is_expected.to create_osl_systemd_unit_drop_in('ldap').with(
+          content: <<~EOC
+            [Unit]
+            After=
+            After=network-online.target docker.socket firewalld.service containerd.service sssd.service
+            After=osl-firewall.service
+          EOC
+        )
+      end
+      it do
+        expect(chef_run.template('/etc/docker/daemon.json').variables[:config]).to include('ip-forward-no-drop' => true)
+      end
+    end
+  end
+
+  context 'debian 12 riscv64, which gets the distro docker.io' do
+    cached(:chef_run) do
+      ChefSpec::SoloRunner.new(DEBIAN_12) do |node|
+        node.normal['osl-firewall']['backend'] = 'nftables'
+        node.automatic['kernel']['machine'] = 'riscv64'
+      end.converge('osl-docker::default')
+    end
+
+    include_context 'common_stubs'
+
+    it { is_expected.to create_docker_service('default').with(package_name: 'docker.io') }
+    it { expect(chef_run.template('/etc/docker/daemon.json').variables[:config]).to_not include('ip-forward-no-drop') }
+    it { is_expected.to delete_osl_systemd_unit_drop_in('iptables-fix') }
+  end
+
+  context 'on the iptables backend' do
+    cached(:chef_run) { ChefSpec::SoloRunner.new(ALMA_9).converge('osl-docker::default') }
+
+    include_context 'common_stubs'
+
+    it { is_expected.to create_osl_systemd_unit_drop_in('iptables-fix') }
+    it { expect(chef_run.template('/etc/docker/daemon.json').variables[:config]).to_not include('ip-forward-no-drop') }
   end
 end

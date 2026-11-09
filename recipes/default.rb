@@ -62,6 +62,22 @@ sysctl "net/ipv6/conf/#{default_iface}/accept_ra" do
   end
 end if default_iface
 
+directory '/etc/docker'
+
+# Docker sets FORWARD to drop when it enables forwarding itself, as on every
+# nftables host at boot; keep other routed traffic (libvirt guests) flowing
+node.default['osl-docker']['daemon']['ip-forward-no-drop'] = true if osl_docker_ip_forward_no_drop?
+
+# Before docker_service: Debian's package starts dockerd on install, and that
+# start must already read this config (ip-forward-no-drop above all)
+template '/etc/docker/daemon.json' do
+  variables(
+    config: node['osl-docker']['daemon']
+  )
+  not_if { node['osl-docker']['client_only'] }
+  notifies :restart, 'docker_service[default]'
+end
+
 docker_service 'default' do
   node['osl-docker']['service'].each do |key, value|
     send(key.to_sym, value)
@@ -84,16 +100,6 @@ docker_service 'default' do
   else
     action [:create]
   end
-end
-
-directory '/etc/docker'
-
-template '/etc/docker/daemon.json' do
-  variables(
-    config: node['osl-docker']['daemon']
-  )
-  not_if { node['osl-docker']['client_only'] }
-  notifies :restart, 'docker_service[default]'
 end
 
 directory '/etc/docker/ssl' do
@@ -179,10 +185,8 @@ cron 'docker_prune_images' do
   not_if { node['osl-docker']['client_only'] }
 end
 
-# In the event the node is utilizing iptables, sync docker to restart when iptables or ip6tables restarts.
-# Docker automatically adds extra rules to iptables, but these changes are not saved on reloads.
-# The matching After= ordering lives in the 'ldap' drop-in below: drop-ins parse in lexical order and ldap.conf
-# resets After=, so anything added here would be discarded.
+# An iptables restart flushes Docker's rules, so restart Docker with it; nftables
+# reloads never touch them. After= lives in 'ldap', which resets After=
 osl_systemd_unit_drop_in 'iptables-fix' do
   unit_name 'docker.service'
   content({
@@ -190,6 +194,7 @@ osl_systemd_unit_drop_in 'iptables-fix' do
               'PartOf' => 'iptables.service ip6tables.service',
             },
           })
+  action osl_firewall_nftables? ? :delete : :create
 end
 
 if osl_docker_package_name == 'docker.io'
@@ -208,16 +213,15 @@ else
   end
 end
 
-# dockerd must never start while iptables/ip6tables are mid-restore: with --live-restore and containers running, a
-# failed bridge-network restore at startup leaves the default bridge half-restored and every new container fails with
-# "network <id> does not exist" until the next docker restart (same defect class as moby/moby#52642).
+# Starting mid-restore half-restores the default bridge under --live-restore, and new
+# containers then fail with "network <id> does not exist" (moby/moby#52642)
 osl_systemd_unit_drop_in 'ldap' do
   unit_name 'docker.service'
   content <<~EOC
     [Unit]
     After=
     After=network-online.target docker.socket firewalld.service containerd.service sssd.service
-    After=iptables.service ip6tables.service
+    After=#{osl_docker_firewall_units}
   EOC
 end
 
