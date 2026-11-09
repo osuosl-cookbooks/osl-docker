@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+4.21.0 (2026-11-09)
+-------------------
+- Tie Docker to osl-firewall's nftables backend
+
 4.20.0 (2026-10-09)
 -------------------
 - Let callers age-limit the weekly image prune
