@@ -1,0 +1,4 @@
+services:
+  busy:
+    image: busybox:latest
+    command: [/bin/sleep, '1d']

@@ -42,4 +42,21 @@ control 'osl_dockercompose' do
   describe docker_container 'oneshot-migrate-1' do
     it { should_not exist }
   end
+
+  describe docker_container 'pulled-busy-1' do
+    it { should exist }
+    it { should be_running }
+    its('image') { should eq 'busybox:latest' }
+  end
+
+  # The first converge started this container on busybox:1.36 tagged as latest;
+  # pull_images had to pull the real latest and recreate it to get here.
+  latest = command("docker image inspect -f '{{.Id}}' busybox:latest").stdout.strip
+  old = command("docker image inspect -f '{{.Id}}' busybox:1.36").stdout.strip
+
+  describe command("docker inspect -f '{{.Image}}' pulled-busy-1") do
+    its('exit_status') { should eq 0 }
+    its('stdout.strip') { should eq latest }
+    its('stdout.strip') { should_not eq old }
+  end
 end

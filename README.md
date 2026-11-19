@@ -118,6 +118,44 @@ happens at every boot. On iptables hosts osl-firewall's `DOCKER-USER` accept rul
 `docker.io` package (riscv64 and ppc64le Debian) may predate the option, so it is set only with docker-ce. A host
 switched to nftables restarts Docker once for the `daemon.json` change; `--live-restore` keeps containers running.
 
+Resources
+---------
+#### osl_dockercompose
+
+Runs a Docker Compose project (`docker compose -p <name>`) from `directory` with the given `config_files`.
+
+| Action | What it runs |
+|---|---|
+| `:up` (default) | `up -d --wait` when any long-running service is down; with `pull_images`, also the pull check below |
+| `:rebuild` | `up --pull always --build -d --wait`, usually notified by the resources that write the project's files |
+| `:restart` | `restart` |
+
+| Property | Type | Default | Description |
+|---|---|---|---|
+| `directory` | String | required | Where the compose files live |
+| `config_files` | Array | `[]` | Compose files, passed as `-f` in order |
+| `pull_images` | true, false | `false` | Pull the project's own images every converge and recreate what runs an outdated one |
+
+`pull_images` reads the images from the compose files themselves (`.env` values and defaults resolved), so nothing has
+to mirror their tags. Each converge it runs `pull --ignore-buildable --ignore-pull-failures`, then compares each
+running container's image with the image its tag points at now; any difference runs
+`up --pull missing --build -d --wait`. Comparing what runs, not the tag before and after the pull, also heals a stack
+a failed rebuild or a manual `docker pull` left behind.
+
+- Locally built images, exited one-shot services and `run --rm` jobs are never compared.
+- A failed pull logs a warning and keeps the stack running; the next converge retries.
+- Every upstream rebuild of a tag means a short restart of the containers that use it.
+- The pull runs even under why-run, as the docker cookbook's `docker_image :pull` does.
+- A run that also notifies `:rebuild` (a changed file) can recreate the stack twice, which is harmless.
+
+``` ruby
+osl_dockercompose 'app' do
+  directory '/opt/app'
+  config_files %w(compose.yml)
+  pull_images true
+end
+```
+
 Contributing
 ------------
 

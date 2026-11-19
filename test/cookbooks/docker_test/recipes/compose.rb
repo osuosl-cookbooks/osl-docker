@@ -39,3 +39,23 @@ execute 'prune exited oneshot container' do
   command 'docker rm oneshot-migrate-1'
   only_if 'docker ps -a --filter name=^oneshot-migrate-1$ --filter status=exited --format "{{.Names}}" | grep -q .'
 end
+
+# No rebuild notification: a delayed rebuild would heal the stale stack below
+# and hide whether pull_images did.
+cookbook_file '/var/lib/compose/docker-pulled.yml'
+
+# First converge only: start the stack on an older busybox tagged as latest, so
+# pull_images has a stale container to find and recreate. The second converge
+# then proves the check stays quiet once the stack is current.
+execute 'start pulled stack on a stale busybox' do
+  command 'docker pull busybox:1.36 && docker tag busybox:1.36 busybox:latest && ' \
+          'docker compose -p pulled -f docker-pulled.yml up -d --wait && touch /var/lib/compose/.pulled-stale'
+  cwd '/var/lib/compose'
+  creates '/var/lib/compose/.pulled-stale'
+end
+
+osl_dockercompose 'pulled' do
+  directory '/var/lib/compose'
+  config_files %w(docker-pulled.yml)
+  pull_images true
+end
