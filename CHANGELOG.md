@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+5.0.0 (2026-11-20)
+------------------
+- Pull each compose stack's images by default
+
 4.21.0 (2026-11-09)
 -------------------
 - Tie Docker to osl-firewall's nftables backend
