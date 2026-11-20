@@ -20,6 +20,21 @@ describe 'osl_dockercompose' do
         { cwd: '/var/lib/test' }
       ).and_return(double(exitstatus: 0, stdout: %({"services":{"web":{},"db":{}}})))
     end
+
+    # pull_images is on by default: the pull finds web already on what its tag points at
+    stubs_for_resource('execute[test pull-rebuild]') do |resource|
+      dir = { cwd: '/var/lib/test' }
+      allow(resource).to receive_shell_out('docker compose -p test  pull --quiet --ignore-buildable --ignore-pull-failures', dir)
+        .and_return(double(exitstatus: 0, stderr: ''))
+      allow(resource).to receive_shell_out('docker compose -p test  config --format json', dir)
+        .and_return(double(exitstatus: 0, stdout: %({"services":{"web":{"image":"nginx:alpine"}}})))
+      allow(resource).to receive_shell_out('docker compose -p test  ps --format json', dir)
+        .and_return(double(exitstatus: 0, stdout: %({"ID":"c1","Service":"web","State":"running"}\n)))
+      allow(resource).to receive_shell_out("docker inspect -f '{{.Image}}' c1")
+        .and_return(double(exitstatus: 0, stdout: "sha256:new\n"))
+      allow(resource).to receive_shell_out("docker image inspect -f '{{.Id}}' nginx:alpine")
+        .and_return(double(exitstatus: 0, stdout: "sha256:new\n"))
+    end
   end
 
   recipe do
@@ -56,5 +71,119 @@ describe 'osl_dockercompose' do
       cwd: '/var/lib/test-configs',
       live_stream: true
     )
+  end
+
+  # pull_images is on by default, so :up carries the guarded pull-rebuild; web is current, so it is skipped
+  it { expect(chef_run.find_resource(:execute, 'test pull-rebuild')).to_not be_nil }
+  it { is_expected.to_not run_execute('test pull-rebuild') }
+
+  # :rebuild and :restart never add it
+  it { expect(chef_run.find_resource(:execute, 'test-configs pull-rebuild')).to be_nil }
+end
+
+describe 'osl_dockercompose pull_images false' do
+  platform 'almalinux'
+  step_into :osl_dockercompose
+
+  recipe do
+    osl_dockercompose 'held' do
+      directory '/var/lib/held'
+      pull_images false
+    end
+  end
+
+  before do
+    stubs_for_resource('execute[held up]') do |resource|
+      allow(resource).to receive_shell_out('docker compose -p held  ps -a --format json', { cwd: '/var/lib/held' })
+        .and_return(double(exitstatus: 0, stdout: %({"ID":"c1","Service":"web","State":"running"}\n)))
+      allow(resource).to receive_shell_out('docker compose -p held  config --format json', { cwd: '/var/lib/held' })
+        .and_return(double(exitstatus: 0, stdout: %({"services":{"web":{"image":"nginx:alpine"}}})))
+    end
+  end
+
+  # Opting out leaves the stack as it was before pull_images existed
+  it { expect(chef_run.find_resource(:execute, 'held pull-rebuild')).to be_nil }
+end
+
+describe 'osl_dockercompose pull_images by default' do
+  platform 'almalinux'
+  step_into :osl_dockercompose
+
+  compose = 'docker compose -p pulled '
+  dir = { cwd: '/var/lib/pulled' }
+  config = %({"services":{"web":{"image":"nginx:alpine"},"app":{"build":{"context":"."},"image":"pulled-app"}}})
+  ps_json = %({"ID":"c1","Service":"web","State":"running"}\n{"ID":"c2","Service":"app","State":"running"}\n)
+
+  recipe do
+    osl_dockercompose 'pulled' do
+      directory '/var/lib/pulled'
+    end
+  end
+
+  def stub_running(resource, ps_json, config)
+    allow(resource).to receive_shell_out('docker compose -p pulled  ps -a --format json', { cwd: '/var/lib/pulled' })
+      .and_return(double(exitstatus: 0, stdout: ps_json))
+    allow(resource).to receive_shell_out('docker compose -p pulled  config --format json', { cwd: '/var/lib/pulled' })
+      .and_return(double(exitstatus: 0, stdout: config))
+  end
+
+  def stub_stale_check(resource, compose, dir, config, ps_json, running_id, wanted_id,
+                       pull_stderr = " Image nginx:alpine Pulling \n Image nginx:alpine Pulled \n")
+    allow(resource).to receive_shell_out("#{compose} pull --quiet --ignore-buildable --ignore-pull-failures", dir)
+      .and_return(double(exitstatus: 0, stderr: pull_stderr))
+    allow(resource).to receive_shell_out("#{compose} config --format json", dir)
+      .and_return(double(exitstatus: 0, stdout: config))
+    allow(resource).to receive_shell_out("#{compose} ps --format json", dir)
+      .and_return(double(exitstatus: 0, stdout: ps_json))
+    allow(resource).to receive_shell_out("docker inspect -f '{{.Image}}' c1")
+      .and_return(double(exitstatus: 0, stdout: "#{running_id}\n"))
+    allow(resource).to receive_shell_out("docker image inspect -f '{{.Id}}' nginx:alpine")
+      .and_return(double(exitstatus: 0, stdout: "#{wanted_id}\n"))
+  end
+
+  context 'when every running container is on its tag' do
+    before do
+      stubs_for_resource('execute[pulled up]') { |r| stub_running(r, ps_json, config) }
+      stubs_for_resource('execute[pulled pull-rebuild]') do |r|
+        stub_stale_check(r, compose, dir, config, ps_json, 'sha256:new', 'sha256:new')
+      end
+    end
+
+    it { is_expected.to_not run_execute('pulled up') }
+    it { is_expected.to_not run_execute('pulled pull-rebuild') }
+  end
+
+  context 'when a running container is behind its tag' do
+    before do
+      stubs_for_resource('execute[pulled up]') { |r| stub_running(r, ps_json, config) }
+      stubs_for_resource('execute[pulled pull-rebuild]') do |r|
+        stub_stale_check(r, compose, dir, config, ps_json, 'sha256:old', 'sha256:new')
+      end
+    end
+
+    it do
+      is_expected.to run_execute('pulled pull-rebuild').with(
+        command: 'docker compose -p pulled  up --pull missing --build -d --wait',
+        cwd: '/var/lib/pulled',
+        live_stream: true
+      )
+    end
+  end
+
+  context 'when the pull fails' do
+    before do
+      stubs_for_resource('execute[pulled up]') { |r| stub_running(r, ps_json, config) }
+      stubs_for_resource('execute[pulled pull-rebuild]') do |r|
+        # --ignore-pull-failures still exits 0; the failure is only an Error line on stderr
+        stub_stale_check(r, compose, dir, config, ps_json, 'sha256:old', 'sha256:new',
+                         " Image nginx:alpine Pulling \n Image nginx:alpine Error Get \"https://registry-1.docker.io/v2/\": EOF \n")
+      end
+    end
+
+    # It warns and still recreates what the earlier pulls left behind
+    it do
+      expect(Chef::Log).to receive(:warn).with(/osl_dockercompose\[pulled\]: pulling images failed/).at_least(:once)
+      is_expected.to run_execute('pulled pull-rebuild')
+    end
   end
 end

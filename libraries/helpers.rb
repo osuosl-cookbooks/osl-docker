@@ -102,6 +102,43 @@ module OslDocker
         end
       end
 
+      # Pulls the stack's images, then reports whether any running container is on an image other
+      # than the one its tag now points at. Comparing what runs (not the tag before and after) also
+      # heals a stack left stale by a failed rebuild or a manual pull. Pull failures only warn.
+      def osl_dockercompose_stale?
+        compose_cmd = "docker compose -p #{new_resource.name} #{new_resource.config_files.map { |f| "-f #{f}" }.join(' ')}"
+        dir = new_resource.directory
+
+        # --ignore-pull-failures exits 0 when an image fails; the failure shows only as an
+        # " Image <ref> Error ..." line on stderr, among the Pulling/Pulled progress lines
+        pull = shell_out("#{compose_cmd} pull --quiet --ignore-buildable --ignore-pull-failures", cwd: dir)
+        failed = pull.stderr.to_s.lines.grep(/^\s*Image \S+ Error/).map(&:strip)
+        unless pull.exitstatus == 0 && failed.empty?
+          Chef::Log.warn("osl_dockercompose[#{new_resource.name}]: pulling images failed, " \
+                         "keeping what runs until the next converge: #{failed.empty? ? pull.stderr.to_s.strip : failed.join('; ')}")
+        end
+
+        config = shell_out("#{compose_cmd} config --format json", cwd: dir)
+        return false unless config.exitstatus == 0
+
+        # Locally built images have no registry tag to fall behind
+        tags = JSON.parse(config.stdout)['services'].to_h.reject { |_, svc| svc['build'] }.transform_values { |svc| svc['image'] }
+
+        # Running containers only: an exited one-shot or a `run --rm` job is never compared
+        ps = shell_out("#{compose_cmd} ps --format json", cwd: dir)
+        return false unless ps.exitstatus == 0
+
+        ps.stdout.split(/\r?\n/).map(&:strip).reject(&:empty?).any? do |line|
+          container = JSON.parse(line)
+          tag = tags[container['Service']]
+          next false unless tag
+
+          running = shell_out("docker inspect -f '{{.Image}}' #{container['ID']}")
+          wanted = shell_out("docker image inspect -f '{{.Id}}' #{tag}")
+          running.exitstatus == 0 && wanted.exitstatus == 0 && running.stdout.strip != wanted.stdout.strip
+        end
+      end
+
       # True when the kernel handles RAs on iface. NetworkManager and networkd set accept_ra=0 when they run RA.
       def osl_docker_kernel_ra?(iface)
         path = "/proc/sys/net/ipv6/conf/#{iface}/accept_ra"
