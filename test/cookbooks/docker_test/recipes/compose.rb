@@ -40,22 +40,30 @@ execute 'prune exited oneshot container' do
   only_if 'docker ps -a --filter name=^oneshot-migrate-1$ --filter status=exited --format "{{.Names}}" | grep -q .'
 end
 
-# No rebuild notification: a delayed rebuild would heal the stale stack below
-# and hide whether pull_images did.
+# No rebuild notification: a delayed rebuild would heal the stale stacks below
+# and hide whether pull_images did, or didn't.
 cookbook_file '/var/lib/compose/docker-pulled.yml'
+cookbook_file '/var/lib/compose/docker-held.yml'
 
-# First converge only: start the stack on an older busybox tagged as latest, so
-# pull_images has a stale container to find and recreate. The second converge
-# then proves the check stays quiet once the stack is current.
-execute 'start pulled stack on a stale busybox' do
+# First converge only: start both stacks on an older busybox tagged as latest.
+# pulled (pull_images by default) has a stale container to find and recreate;
+# held (pull_images false) must be left on it. The second converge then proves
+# the check stays quiet once pulled is current.
+execute 'start pulled and held stacks on a stale busybox' do
   command 'docker pull busybox:1.36 && docker tag busybox:1.36 busybox:latest && ' \
-          'docker compose -p pulled -f docker-pulled.yml up -d --wait && touch /var/lib/compose/.pulled-stale'
+          'docker compose -p pulled -f docker-pulled.yml up -d --wait && ' \
+          'docker compose -p held -f docker-held.yml up -d --wait && touch /var/lib/compose/.pulled-stale'
   cwd '/var/lib/compose'
   creates '/var/lib/compose/.pulled-stale'
+end
+
+osl_dockercompose 'held' do
+  directory '/var/lib/compose'
+  config_files %w(docker-held.yml)
+  pull_images false
 end
 
 osl_dockercompose 'pulled' do
   directory '/var/lib/compose'
   config_files %w(docker-pulled.yml)
-  pull_images true
 end

@@ -7,7 +7,7 @@ default_action :up
 property :directory, String, required: true
 property :config_files, Array, default: []
 # Pull the stack's own images every converge and recreate whatever runs an outdated one
-property :pull_images, [true, false], default: false
+property :pull_images, [true, false], default: true
 
 action :up do
   execute "#{new_resource.name} up" do

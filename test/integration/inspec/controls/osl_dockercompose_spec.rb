@@ -50,7 +50,7 @@ control 'osl_dockercompose' do
   end
 
   # The first converge started this container on busybox:1.36 tagged as latest;
-  # pull_images had to pull the real latest and recreate it to get here.
+  # pull_images, on by default, had to pull the real latest and recreate it to get here.
   latest = command("docker image inspect -f '{{.Id}}' busybox:latest").stdout.strip
   old = command("docker image inspect -f '{{.Id}}' busybox:1.36").stdout.strip
 
@@ -58,5 +58,12 @@ control 'osl_dockercompose' do
     its('exit_status') { should eq 0 }
     its('stdout.strip') { should eq latest }
     its('stdout.strip') { should_not eq old }
+  end
+
+  # held opted out with pull_images false, so it still runs the busybox:1.36 it started on
+  describe command("docker inspect -f '{{.Image}}' held-busy-1") do
+    its('exit_status') { should eq 0 }
+    its('stdout.strip') { should eq old }
+    its('stdout.strip') { should_not eq latest }
   end
 end

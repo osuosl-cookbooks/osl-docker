@@ -20,6 +20,21 @@ describe 'osl_dockercompose' do
         { cwd: '/var/lib/test' }
       ).and_return(double(exitstatus: 0, stdout: %({"services":{"web":{},"db":{}}})))
     end
+
+    # pull_images is on by default: the pull finds web already on what its tag points at
+    stubs_for_resource('execute[test pull-rebuild]') do |resource|
+      dir = { cwd: '/var/lib/test' }
+      allow(resource).to receive_shell_out('docker compose -p test  pull --quiet --ignore-buildable --ignore-pull-failures', dir)
+        .and_return(double(exitstatus: 0, stderr: ''))
+      allow(resource).to receive_shell_out('docker compose -p test  config --format json', dir)
+        .and_return(double(exitstatus: 0, stdout: %({"services":{"web":{"image":"nginx:alpine"}}})))
+      allow(resource).to receive_shell_out('docker compose -p test  ps --format json', dir)
+        .and_return(double(exitstatus: 0, stdout: %({"ID":"c1","Service":"web","State":"running"}\n)))
+      allow(resource).to receive_shell_out("docker inspect -f '{{.Image}}' c1")
+        .and_return(double(exitstatus: 0, stdout: "sha256:new\n"))
+      allow(resource).to receive_shell_out("docker image inspect -f '{{.Id}}' nginx:alpine")
+        .and_return(double(exitstatus: 0, stdout: "sha256:new\n"))
+    end
   end
 
   recipe do
@@ -58,11 +73,39 @@ describe 'osl_dockercompose' do
     )
   end
 
-  # pull_images is off by default, so callers' runs don't even show the pull-rebuild execute
-  it { expect(chef_run.find_resource(:execute, 'test pull-rebuild')).to be_nil }
+  # pull_images is on by default, so :up carries the guarded pull-rebuild; web is current, so it is skipped
+  it { expect(chef_run.find_resource(:execute, 'test pull-rebuild')).to_not be_nil }
+  it { is_expected.to_not run_execute('test pull-rebuild') }
+
+  # :rebuild and :restart never add it
+  it { expect(chef_run.find_resource(:execute, 'test-configs pull-rebuild')).to be_nil }
 end
 
-describe 'osl_dockercompose pull_images' do
+describe 'osl_dockercompose pull_images false' do
+  platform 'almalinux'
+  step_into :osl_dockercompose
+
+  recipe do
+    osl_dockercompose 'held' do
+      directory '/var/lib/held'
+      pull_images false
+    end
+  end
+
+  before do
+    stubs_for_resource('execute[held up]') do |resource|
+      allow(resource).to receive_shell_out('docker compose -p held  ps -a --format json', { cwd: '/var/lib/held' })
+        .and_return(double(exitstatus: 0, stdout: %({"ID":"c1","Service":"web","State":"running"}\n)))
+      allow(resource).to receive_shell_out('docker compose -p held  config --format json', { cwd: '/var/lib/held' })
+        .and_return(double(exitstatus: 0, stdout: %({"services":{"web":{"image":"nginx:alpine"}}})))
+    end
+  end
+
+  # Opting out leaves the stack as it was before pull_images existed
+  it { expect(chef_run.find_resource(:execute, 'held pull-rebuild')).to be_nil }
+end
+
+describe 'osl_dockercompose pull_images by default' do
   platform 'almalinux'
   step_into :osl_dockercompose
 
@@ -74,7 +117,6 @@ describe 'osl_dockercompose pull_images' do
   recipe do
     osl_dockercompose 'pulled' do
       directory '/var/lib/pulled'
-      pull_images true
     end
   end
 
