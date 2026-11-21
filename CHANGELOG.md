@@ -3,6 +3,10 @@ osl-docker CHANGELOG
 This file is used to list changes made in each version of the
 osl-docker cookbook.
 
+5.0.1 (2026-11-21)
+------------------
+- Let compose decide which stacks are stale
+
 5.0.0 (2026-11-20)
 ------------------
 - Pull each compose stack's images by default
