@@ -137,18 +137,23 @@ Runs a Docker Compose project (`docker compose -p <name>`) from `directory` with
 | `pull_images` | true, false | `true` | Pull the project's own images every converge and recreate what runs an outdated one |
 
 `pull_images` reads the images from the compose files themselves (`.env` values and defaults resolved), so nothing has
-to mirror their tags. Each converge it runs `pull --ignore-buildable --ignore-pull-failures`, then compares each
-running container's image with the image its tag points at now; any difference runs
-`up --pull missing --build -d --wait`. Comparing what runs, not the tag before and after the pull, also heals a stack
-a failed rebuild or a manual `docker pull` left behind.
+to mirror their tags. Each converge it runs `pull --ignore-buildable --ignore-pull-failures`, then asks compose itself
+whether `up` would recreate anything (`--dry-run up -d --pull never --no-build`). Any `Recreate` runs
+`up -d --pull never`. Because the decision is compose's own, the check and the recreate can't disagree, whatever image
+store the host uses, and a stack that a failed rebuild or a manual `docker pull` left behind heals on the next converge.
 
-- Locally built images, exited one-shot services and `run --rm` jobs are never compared.
+- Locally built images are never pulled, and a stopped or exited one-shot service never counts as stale. A recreate
+  still starts exited one-shots again, as `up` does.
+- The recreate doesn't wait for health (`--wait`), so a slow-starting service or an unrelated unhealthy one doesn't
+  fail the converge. `:up` and `:rebuild` still wait.
+- A failed dry run logs a warning and leaves the stack as it is.
 - A failed pull logs a warning and keeps the stack running; the next converge retries.
 - Every upstream rebuild of a tag means a short restart of the containers that use it. That includes database images on
   a moving tag such as `postgres:16` or `mongo:8.0`, which restart when upstream pushes a new patch build.
 - `pull_images false` opts a stack out, leaving its images to `:rebuild` and any `docker_image` resources.
 - The pull runs even under why-run, as the docker cookbook's `docker_image :pull` does.
-- A run that also notifies `:rebuild` (a changed file) can recreate the stack twice, which is harmless.
+- A changed compose file also shows as `Recreate`, so a run that notifies `:rebuild` can recreate the stack twice, which
+  is harmless.
 
 ``` ruby
 osl_dockercompose 'app' do
