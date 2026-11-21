@@ -21,19 +21,13 @@ describe 'osl_dockercompose' do
       ).and_return(double(exitstatus: 0, stdout: %({"services":{"web":{},"db":{}}})))
     end
 
-    # pull_images is on by default: the pull finds web already on what its tag points at
+    # pull_images is on by default: compose's dry run would recreate nothing
     stubs_for_resource('execute[test pull-rebuild]') do |resource|
       dir = { cwd: '/var/lib/test' }
       allow(resource).to receive_shell_out('docker compose -p test  pull --quiet --ignore-buildable --ignore-pull-failures', dir)
         .and_return(double(exitstatus: 0, stderr: ''))
-      allow(resource).to receive_shell_out('docker compose -p test  config --format json', dir)
-        .and_return(double(exitstatus: 0, stdout: %({"services":{"web":{"image":"nginx:alpine"}}})))
-      allow(resource).to receive_shell_out('docker compose -p test  ps --format json', dir)
-        .and_return(double(exitstatus: 0, stdout: %({"ID":"c1","Service":"web","State":"running"}\n)))
-      allow(resource).to receive_shell_out("docker inspect -f '{{.Image}}' c1")
-        .and_return(double(exitstatus: 0, stdout: "sha256:new\n"))
-      allow(resource).to receive_shell_out("docker image inspect -f '{{.Id}}' nginx:alpine")
-        .and_return(double(exitstatus: 0, stdout: "sha256:new\n"))
+      allow(resource).to receive_shell_out('docker compose -p test  --dry-run up -d --pull never --no-build', dir)
+        .and_return(double(exitstatus: 0, stdout: '', stderr: " Container test-web-1 Running \n"))
     end
   end
 
@@ -113,6 +107,8 @@ describe 'osl_dockercompose pull_images by default' do
   dir = { cwd: '/var/lib/pulled' }
   config = %({"services":{"web":{"image":"nginx:alpine"},"app":{"build":{"context":"."},"image":"pulled-app"}}})
   ps_json = %({"ID":"c1","Service":"web","State":"running"}\n{"ID":"c2","Service":"app","State":"running"}\n)
+  pulled = " Image nginx:alpine Pulling \n Image nginx:alpine Pulled \n"
+  current = " Container pulled-web-1 Running \n Container pulled-app-1 Running \n"
 
   recipe do
     osl_dockercompose 'pulled' do
@@ -127,47 +123,49 @@ describe 'osl_dockercompose pull_images by default' do
       .and_return(double(exitstatus: 0, stdout: config))
   end
 
-  def stub_stale_check(resource, compose, dir, config, ps_json, running_id, wanted_id,
-                       pull_stderr = " Image nginx:alpine Pulling \n Image nginx:alpine Pulled \n")
+  def stub_stale_check(resource, compose, dir, pull_stderr, dry_stderr, dry_exit = 0)
     allow(resource).to receive_shell_out("#{compose} pull --quiet --ignore-buildable --ignore-pull-failures", dir)
       .and_return(double(exitstatus: 0, stderr: pull_stderr))
-    allow(resource).to receive_shell_out("#{compose} config --format json", dir)
-      .and_return(double(exitstatus: 0, stdout: config))
-    allow(resource).to receive_shell_out("#{compose} ps --format json", dir)
-      .and_return(double(exitstatus: 0, stdout: ps_json))
-    allow(resource).to receive_shell_out("docker inspect -f '{{.Image}}' c1")
-      .and_return(double(exitstatus: 0, stdout: "#{running_id}\n"))
-    allow(resource).to receive_shell_out("docker image inspect -f '{{.Id}}' nginx:alpine")
-      .and_return(double(exitstatus: 0, stdout: "#{wanted_id}\n"))
+    allow(resource).to receive_shell_out("#{compose} --dry-run up -d --pull never --no-build", dir)
+      .and_return(double(exitstatus: dry_exit, stdout: '', stderr: dry_stderr))
   end
 
-  context 'when every running container is on its tag' do
+  context 'when compose would recreate nothing' do
     before do
       stubs_for_resource('execute[pulled up]') { |r| stub_running(r, ps_json, config) }
-      stubs_for_resource('execute[pulled pull-rebuild]') do |r|
-        stub_stale_check(r, compose, dir, config, ps_json, 'sha256:new', 'sha256:new')
-      end
+      stubs_for_resource('execute[pulled pull-rebuild]') { |r| stub_stale_check(r, compose, dir, pulled, current) }
     end
 
     it { is_expected.to_not run_execute('pulled up') }
     it { is_expected.to_not run_execute('pulled pull-rebuild') }
   end
 
-  context 'when a running container is behind its tag' do
+  context 'when compose would recreate a container' do
     before do
       stubs_for_resource('execute[pulled up]') { |r| stub_running(r, ps_json, config) }
       stubs_for_resource('execute[pulled pull-rebuild]') do |r|
-        stub_stale_check(r, compose, dir, config, ps_json, 'sha256:old', 'sha256:new')
+        stub_stale_check(r, compose, dir, pulled, " Container pulled-web-1 Recreate \n Container pulled-web-1 Recreated \n")
       end
     end
 
     it do
       is_expected.to run_execute('pulled pull-rebuild').with(
-        command: 'docker compose -p pulled  up --pull missing --build -d --wait',
+        command: 'docker compose -p pulled  up -d --pull never',
         cwd: '/var/lib/pulled',
         live_stream: true
       )
     end
+  end
+
+  context 'when only an exited one-shot would start again' do
+    before do
+      stubs_for_resource('execute[pulled up]') { |r| stub_running(r, ps_json, config) }
+      stubs_for_resource('execute[pulled pull-rebuild]') do |r|
+        stub_stale_check(r, compose, dir, pulled, "#{current} Container pulled-migrate-1 Starting \n Container pulled-migrate-1 Started \n")
+      end
+    end
+
+    it { is_expected.to_not run_execute('pulled pull-rebuild') }
   end
 
   context 'when the pull fails' do
@@ -175,8 +173,9 @@ describe 'osl_dockercompose pull_images by default' do
       stubs_for_resource('execute[pulled up]') { |r| stub_running(r, ps_json, config) }
       stubs_for_resource('execute[pulled pull-rebuild]') do |r|
         # --ignore-pull-failures still exits 0; the failure is only an Error line on stderr
-        stub_stale_check(r, compose, dir, config, ps_json, 'sha256:old', 'sha256:new',
-                         " Image nginx:alpine Pulling \n Image nginx:alpine Error Get \"https://registry-1.docker.io/v2/\": EOF \n")
+        stub_stale_check(r, compose, dir,
+                         " Image nginx:alpine Pulling \n Image nginx:alpine Error Get \"https://registry-1.docker.io/v2/\": EOF \n",
+                         " Container pulled-web-1 Recreate \n")
       end
     end
 
@@ -184,6 +183,20 @@ describe 'osl_dockercompose pull_images by default' do
     it do
       expect(Chef::Log).to receive(:warn).with(/osl_dockercompose\[pulled\]: pulling images failed/).at_least(:once)
       is_expected.to run_execute('pulled pull-rebuild')
+    end
+  end
+
+  context 'when the dry run fails' do
+    before do
+      stubs_for_resource('execute[pulled up]') { |r| stub_running(r, ps_json, config) }
+      stubs_for_resource('execute[pulled pull-rebuild]') do |r|
+        stub_stale_check(r, compose, dir, pulled, 'service "web" refers to undefined volume data', 1)
+      end
+    end
+
+    it do
+      expect(Chef::Log).to receive(:warn).with(/osl_dockercompose\[pulled\]: the dry run failed/).at_least(:once)
+      is_expected.to_not run_execute('pulled pull-rebuild')
     end
   end
 end

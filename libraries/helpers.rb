@@ -102,9 +102,10 @@ module OslDocker
         end
       end
 
-      # Pulls the stack's images, then reports whether any running container is on an image other
-      # than the one its tag now points at. Comparing what runs (not the tag before and after) also
-      # heals a stack left stale by a failed rebuild or a manual pull. Pull failures only warn.
+      # Pulls the stack's images, then asks compose itself, with a dry run, whether `up` would recreate
+      # anything. Compose's own decision can't disagree with the recreate, whatever image store the host
+      # uses (on containerd, a multi-platform tag's id is its index, not what the container runs).
+      # Pull failures and a failed dry run only warn.
       def osl_dockercompose_stale?
         compose_cmd = "docker compose -p #{new_resource.name} #{new_resource.config_files.map { |f| "-f #{f}" }.join(' ')}"
         dir = new_resource.directory
@@ -118,25 +119,17 @@ module OslDocker
                          "keeping what runs until the next converge: #{failed.empty? ? pull.stderr.to_s.strip : failed.join('; ')}")
         end
 
-        config = shell_out("#{compose_cmd} config --format json", cwd: dir)
-        return false unless config.exitstatus == 0
-
-        # Locally built images have no registry tag to fall behind
-        tags = JSON.parse(config.stdout)['services'].to_h.reject { |_, svc| svc['build'] }.transform_values { |svc| svc['image'] }
-
-        # Running containers only: an exited one-shot or a `run --rm` job is never compared
-        ps = shell_out("#{compose_cmd} ps --format json", cwd: dir)
-        return false unless ps.exitstatus == 0
-
-        ps.stdout.split(/\r?\n/).map(&:strip).reject(&:empty?).any? do |line|
-          container = JSON.parse(line)
-          tag = tags[container['Service']]
-          next false unless tag
-
-          running = shell_out("docker inspect -f '{{.Image}}' #{container['ID']}")
-          wanted = shell_out("docker image inspect -f '{{.Id}}' #{tag}")
-          running.exitstatus == 0 && wanted.exitstatus == 0 && running.stdout.strip != wanted.stdout.strip
+        # Only Recreate counts: a stopped or exited service (a one-shot migrate) shows as Starting
+        dry = shell_out("#{compose_cmd} --dry-run up -d --pull never --no-build", cwd: dir)
+        unless dry.exitstatus == 0
+          Chef::Log.warn("osl_dockercompose[#{new_resource.name}]: the dry run failed, leaving the stack as it is: " \
+                         "#{dry.stderr.to_s.strip}")
+          return false
         end
+
+        recreate = "#{dry.stdout}#{dry.stderr}".lines.grep(/\bContainer \S+ Recreate\b/).map(&:strip).uniq
+        Chef::Log.info("osl_dockercompose[#{new_resource.name}]: #{recreate.join('; ')}") unless recreate.empty?
+        recreate.any?
       end
 
       # True when the kernel handles RAs on iface. NetworkManager and networkd set accept_ra=0 when they run RA.

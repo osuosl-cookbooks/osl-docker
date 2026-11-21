@@ -18,10 +18,12 @@ action :up do
   end
 
   # The guard has just pulled, so `up` must not pull again: it has no --ignore-pull-failures, and a
-  # second pull of one flaky image would fail the run that pull_images is meant to let carry on
+  # second pull of one flaky image would fail the run that pull_images is meant to let carry on.
+  # No --wait: a recreated service that starts slowly, or an unrelated unhealthy one, must not fail
+  # the converge; health is the healthcheck's and monitoring's job. No --build: :rebuild does that.
   if new_resource.pull_images
     execute "#{new_resource.name} pull-rebuild" do
-      command "docker compose -p #{new_resource.name} #{new_resource.config_files.map { |f| "-f #{f}" }.join(' ')} up --pull missing --build -d --wait"
+      command "docker compose -p #{new_resource.name} #{new_resource.config_files.map { |f| "-f #{f}" }.join(' ')} up -d --pull never"
       cwd new_resource.directory
       live_stream true
       only_if { osl_dockercompose_stale? }
